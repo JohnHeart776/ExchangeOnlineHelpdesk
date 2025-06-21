@@ -1,0 +1,29 @@
+RewriteEngine 																On
+
+RewriteRule ^file/([a-f0-9\-]+)/([a-f0-9]+)/?$								file.php?guid=$1&secret=$2 [QSA]
+
+RewriteRule ^articles/?$													articles.php
+RewriteRule ^article/([a-z0-9\-]+)/?$										article.php?slug=$1
+
+RewriteRule ^dashboard/?$													dashboard.php
+RewriteRule ^dashboard/compact/?$											dashboard_compact.php
+
+RewriteRule ^search.html?													search.php?mode=html [QSA]
+RewriteRule ^search.json?													search.php?mode=json [QSA]
+
+
+RewriteRule ^ticket/([A-Fa-f0-9]{10})/?										ticket.php?TicketNumber=$1
+RewriteRule ^mail/attachment/download/([a-f0-9\-]+)/([a-f0-9]+)/?			mail_attachment.php?mode=download&guid=$1&secret=$2
+RewriteRule ^mail/attachment/text/([a-f0-9\-]+)/([a-f0-9]+)/?				mail_attachment.php?mode=text&guid=$1&secret=$2
+
+RewriteRule ^login/?$														login.php
+RewriteRule ^login/auth/microsoft/?$										login_auth_microsoft.php
+
+RewriteRule ^logout/?$														logout.php
+
+RewriteRule ^logo/([a-z0-9\-]+).svg?$										logo.php?variant=$1
+RewriteRule ^favicon.ico?$													favicon.php
+
+
+#deny access to certain
+RewriteRule ^(\.gitlab.*|sonar.*)$ - [F,L]

@@ -1,0 +1,19 @@
+RewriteEngine												On
+
+
+RewriteRule ^user/update.json$								user_update.php
+
+RewriteRule ^config/update.json$							config_update.php
+
+RewriteRule ^article/delete.json$							article_delete.php
+
+RewriteRule ^category/update.json$							category_update.php
+RewriteRule ^category/tickets.json$							category_tickets.php
+
+RewriteRule ^status/update.json$							status_update.php
+
+RewriteRule ^notificationtemplates.json$					notificationtemplates.php
+RewriteRule ^notificationtemplate/update.json$				notificationtemplate_update.php
+RewriteRule ^notificationtemplate/add.json$					notificationtemplate_add.php
+
+RewriteRule ^mail/attachment/ignore.json$					mail_attachment_ignore.php

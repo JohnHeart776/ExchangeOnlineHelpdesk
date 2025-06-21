@@ -1,0 +1,33 @@
+RewriteEngine											On
+
+
+RewriteRule ^my/?										my.php
+
+RewriteRule ^calendar/?									calendar.php
+RewriteRule ^search/?									search.php
+
+RewriteRule ^teamview/?									teamview.php
+
+RewriteRule ^articles/?									articles.php
+RewriteRule ^article/([a-f0-9\-]+)/?					article.php?guid=$1
+
+RewriteRule ^organizationusers/?						organizationusers.php
+RewriteRule ^organizationuser/([a-f0-9\-]+)/?			organizationuser.php?guid=$1
+
+RewriteRule ^actionitems/?								actionitems.php
+RewriteRule ^actionitem/([a-f0-9\-]+)/?					actionitem.php?guid=$1
+
+RewriteRule ^ticket/new//?								ticket_new.php
+
+RewriteRule ^menus/?									menus.php
+RewriteRule ^menuitem/([a-f0-9\-]+)/?					menuitem.php?guid=$1
+
+RewriteRule ^actiongroups/?								actiongroups.php
+RewriteRule ^actiongroup/([a-f0-9\-]+)/?				actiongroup.php?guid=$1
+
+RewriteRule ^categorysuggestions/?						categorysuggestions.php
+
+RewriteRule ^textreplacements/?							textreplacements.php
+
+RewriteRule ^templatetexts/?							templatetexts.php
+RewriteRule ^templatetext/([a-f0-9\-]+)/?				templatetext.php?guid=$1

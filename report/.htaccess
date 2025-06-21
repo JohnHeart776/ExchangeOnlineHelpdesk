@@ -1,0 +1,8 @@
+RewriteEngine											On
+
+RewriteRule ^agent/distribution/?						agent_distribution.php
+RewriteRule ^ticket/open/?								ticket_open.php
+RewriteRule ^tickets/byDayAndTime/?						tickets_byDayAndTime.php
+RewriteRule ^tickets/byDay/?							tickets_byDay.php
+RewriteRule ^tickets/byCategory/?						tickets_byCategory.php
+

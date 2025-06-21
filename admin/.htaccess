@@ -1,0 +1,19 @@
+RewriteEngine											On
+
+RewriteRule ^config/?									config.php
+
+RewriteRule ^aicaches/?									aicaches.php
+RewriteRule ^categories/?								categories.php
+RewriteRule ^category/([a-f0-9\-]+)/?					category.php?guid=$1
+
+RewriteRule ^users/?$									users.php
+RewriteRule ^user/([a-f0-9\-]+)/?$						user.php?guid=$1
+
+RewriteRule ^stati/?$									stati.php
+RewriteRule ^status/([a-f0-9\-]+)/?$					status.php?guid=$1
+
+RewriteRule ^notificationtemplates/?$					notificationtemplates.php
+RewriteRule ^notificationtemplate/([a-f0-9\-]+)/?$		notificationtemplate.php?guid=$1
+
+RewriteRule ^ticket/([a-f0-9\-]+)/export/text.txt?		ticket_export_text.php?guid=$1
+

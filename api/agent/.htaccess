@@ -1,0 +1,105 @@
+RewriteEngine									On
+
+
+RewriteRule ^ai/generate.json						ai_generate.php
+
+RewriteRule ^agents.json							agents.php
+
+RewriteRule ^colors.json							colors.php
+RewriteRule ^categories.json						categories.php [QSA]
+RewriteRule ^stati.json								stati.php [QSA]
+
+RewriteRule ^categorysuggestion/create.json$		categorysuggestion_create.php
+RewriteRule ^categorysuggestion/update.json$		categorysuggestion_update.php
+RewriteRule ^categorysuggestion/delete.json$		categorysuggestion_delete.php
+
+RewriteRule ^textreplace/create.json$				textreplace_create.php
+RewriteRule ^textreplace/update.json$				textreplace_update.php
+RewriteRule ^textreplace/delete.json$				textreplace_delete.php
+
+RewriteRule ^article.json$							article.php
+RewriteRule ^article/add.json$						article_add.php
+RewriteRule ^article/generate.json$					article_generate.php
+RewriteRule ^article/update.json$					article_update.php
+RewriteRule ^articles.json$							articles.php
+
+RewriteRule ^menuitem/add.json$						menuitem_add.php
+RewriteRule ^menuitem/update.json$					menuitem_update.php
+RewriteRule ^menuitem/delete.json$					menuitem_delete.php
+
+RewriteRule ^menuitem/image/upload.json$			menuitem_image_upload.php
+RewriteRule ^menuitem/image/fromNounProject.json$	menuitem_image_fromNounProject.php
+RewriteRule ^menuitem/image/fromIconFinder.json$	menuitem_image_fromIconFinder.php
+
+RewriteRule ^textreplace/update.json$				textreplace_update.php
+
+RewriteRule ^tickets/combine.json$					tickets_combine.php
+
+RewriteRule ^ticket/file/fromMailAttachment.json$	ticket_file_fromMailAttachment.php
+RewriteRule ^ticket/update.json$					ticket_update.php
+RewriteRule ^ticket/unassign.json$					ticket_unassign.php
+RewriteRule ^ticket/assign/me.json$					ticket_assign_me.php
+RewriteRule ^ticket/assign.json$					ticket_assign.php
+
+RewriteRule ^ticket/file/upload.json$				ticket_file_upload.php
+RewriteRule ^ticket/file/update.json$				ticket_file_update.php
+
+RewriteRule ^ticket/actiongroup/add.json$			ticket_actiongroup_add.php
+
+RewriteRule ^ticket/ai/recap.json$					ticket_ai_recap.php
+RewriteRule ^ticket/ai/generateAnswer.json$			ticket_ai_generateAnswer.php
+
+RewriteRule ^ticket/associate/delete.json$			ticket_associate_delete.php
+
+RewriteRule ^ticket/actionitem/update.json$			ticket_actionitem_update.php
+RewriteRule ^ticket/actionitem/add.json$			ticket_actionitem_add.php
+RewriteRule ^ticket/actionitem/generateAi.json$		ticket_actionitem_generateAi.php
+RewriteRule ^ticket/actionitem/toggle.json$			ticket_actionitem_toggle.php
+
+RewriteRule ^ticket/associate/add.json$				ticket_associate_add.php
+RewriteRule ^ticket/associate/search.json$			ticket_associate_search.php
+
+RewriteRule ^ticket/comment/add.json$				ticket_comment_add.php
+RewriteRule ^ticket/comment/mail.json$				ticket_comment_mail.php
+RewriteRule ^ticket/comment/update.json$			ticket_comment_update.php
+
+RewriteRule ^ticket/copy.json$						ticket_copy.php
+
+RewriteRule ^ticket/subject/suggest.json$			ticket_subject_suggest.php
+
+RewriteRule ^ticket/duedate/change.json$			ticket_duedate_change.php
+
+RewriteRule ^tickets/calendar/day.json$				tickets_calendar_day.php
+RewriteRule ^tickets/my/open.json$					tickets_my_open.php
+
+
+RewriteRule ^ticket/status/assign.json$				ticket_status_assign.php
+RewriteRule ^ticket/status/close.json$				ticket_status_close.php?solve=0
+RewriteRule ^ticket/status/solve.json$				ticket_status_close.php?solve=1
+RewriteRule ^ticket/status/assignAndWorkOn.json$	ticket_status_assignAndWorkOn.php
+
+RewriteRule ^tickets/status/close.json$				tickets_status_close.php?solve=0
+RewriteRule ^tickets/status/solve.json$				tickets_status_close.php?solve=1
+RewriteRule ^tickets/since.json$					tickets_since.php
+
+RewriteRule ^actiongroup/add.json$					actiongroup_add.php
+RewriteRule ^actiongroup/distribute.json$			actiongroup_distribute.php
+RewriteRule ^actiongroup/update.json$				actiongroup_update.php
+
+RewriteRule ^actionitem/add.json$					actionitem_add.php
+RewriteRule ^actionitem/delete.json$				actionitem_delete.php
+RewriteRule ^actionitem/update.json$				actionitem_update.php
+
+RewriteRule ^templatetext/add.json$					templatetext_add.php
+RewriteRule ^templatetext/delete.json$				templatetext_delete.php
+RewriteRule ^templatetext/update.json$				templatetext_update.php
+RewriteRule ^templatetext.json$						templatetext.php
+RewriteRule ^templatetexts.json$					templatetexts.php
+
+RewriteRule ^organizationusers.json$				organizationusers.php [QSA]
+
+RewriteRule ^ticket/new.json$						ticket_new.php [QSA]
+
+RewriteRule ^calendar.json$							calendar.php [QSA]
+
+

@@ -1,0 +1,1 @@
+{include file="agent_dashboard_script.tpl"}
