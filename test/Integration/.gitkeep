@@ -1,0 +1,4 @@
+# Integration tests directory
+# 
+# This directory is for integration tests that test the interaction between
+# multiple components or require external dependencies like databases.
