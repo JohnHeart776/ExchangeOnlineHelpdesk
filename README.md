@@ -1,6 +1,6 @@
-# TicketHarbor - Advanced Ticket Management System
+# Exchange Online Ticket System EOTS - Advanced Ticket Management System
 
-TicketHarbor is a comprehensive web-based ticket management system designed for organizations using Microsoft 365. It automatically fetches emails from designated mailboxes, converts them into support tickets, and provides a powerful interface for agents and users to manage and track ticket resolution.
+EOTS is a comprehensive web-based ticket management system designed for organizations using Microsoft 365. It automatically fetches emails from designated mailboxes, converts them into support tickets, and provides a powerful interface for agents and users to manage and track ticket resolution.
 
 ## Table of Contents
 
@@ -19,7 +19,7 @@ TicketHarbor is a comprehensive web-based ticket management system designed for 
 
 ## Overview
 
-TicketHarbor is an enterprise-grade ticket management solution that seamlessly integrates with Microsoft 365 environments. The system automatically processes incoming emails, creates tickets, and provides role-based access for both support agents and end users.
+EOTS is an enterprise-grade ticket management solution that seamlessly integrates with Microsoft 365 environments. The system automatically processes incoming emails, creates tickets, and provides role-based access for both support agents and end users.
 
 ### What This Project Does
 
@@ -68,7 +68,7 @@ TicketHarbor is an enterprise-grade ticket management solution that seamlessly i
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Microsoft     │    │   TicketHarbor   │    │   Database      │
+│   Microsoft     │    │   EOTS   │    │   Database      │
 │   Graph API     │◄──►│   Application    │◄──►│   (MariaDB)     │
 │                 │    │                  │    │                 │
 │ • Mail Fetching │    │ • Ticket Mgmt    │    │ • Tickets       │
@@ -88,7 +88,7 @@ TicketHarbor is an enterprise-grade ticket management solution that seamlessly i
 
 ## Prerequisites
 
-Before installing TicketHarbor, ensure you have:
+Before installing EOTS, ensure you have:
 
 - **Web Server**: Apache or Nginx with PHP 8.0+
 - **Database**: MariaDB 10.4+ or MySQL 8.0+
@@ -104,7 +104,7 @@ Before installing TicketHarbor, ensure you have:
 
 ## Azure Application Setup
 
-TicketHarbor requires **two separate Azure applications** to function properly:
+EOTS requires **two separate Azure applications** to function properly:
 
 ### 1. Mail Fetching Application (Service Principal)
 
@@ -114,14 +114,14 @@ This application is used for server-to-server communication to fetch emails from
 1. Go to [Azure Portal](https://portal.azure.com) → Azure Active Directory → App registrations
 2. Click "New registration"
 3. Configure:
-   - **Name**: `TicketHarbor Mail Service`
+   - **Name**: `EOTS Mail Service`
    - **Supported account types**: Accounts in this organizational directory only
    - **Redirect URI**: Leave empty for now
 4. After creation, note down:
    - **Application (client) ID**
    - **Directory (tenant) ID**
 5. Go to "Certificates & secrets" → "New client secret"
-   - **Description**: `TicketHarbor Mail Access`
+   - **Description**: `EOTS Mail Access`
    - **Expires**: Choose appropriate duration
    - **Copy the secret value** (you won't see it again!)
 6. Go to "API permissions" → "Add a permission" → "Microsoft Graph" → "Application permissions"
@@ -145,7 +145,7 @@ This application handles user authentication and login.
 1. Go to Azure Portal → Azure Active Directory → App registrations
 2. Click "New registration"
 3. Configure:
-   - **Name**: `TicketHarbor User Login`
+   - **Name**: `EOTS User Login`
    - **Supported account types**: Accounts in this organizational directory only
    - **Redirect URI**: 
      - Type: Web
@@ -154,7 +154,7 @@ This application handles user authentication and login.
    - **Application (client) ID**
    - **Directory (tenant) ID**
 5. Go to "Certificates & secrets" → "New client secret"
-   - **Description**: `TicketHarbor User Login`
+   - **Description**: `EOTS User Login`
    - **Expires**: Choose appropriate duration
    - **Copy the secret value**
 6. Go to "API permissions" → "Add a permission" → "Microsoft Graph" → "Delegated permissions"
@@ -175,13 +175,13 @@ This application handles user authentication and login.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/ticketharbor.git
-cd ticketharbor
+git clone https://github.com/your-org/EOTS.git
+cd EOTS
 
 # Or download and extract the ZIP file
-wget https://github.com/your-org/ticketharbor/archive/main.zip
+wget https://github.com/your-org/EOTS/archive/main.zip
 unzip main.zip
-cd ticketharbor-main
+cd EOTS-main
 ```
 
 ### 2. Set Up Web Server
@@ -189,14 +189,14 @@ cd ticketharbor-main
 #### Apache Configuration:
 ```apache
 <VirtualHost *:443>
-    ServerName ticketharbor.yourdomain.com
-    DocumentRoot /var/www/ticketharbor
+    ServerName EOTS.yourdomain.com
+    DocumentRoot /var/www/EOTS
 
     SSLEngine on
     SSLCertificateFile /path/to/your/certificate.crt
     SSLCertificateKeyFile /path/to/your/private.key
 
-    <Directory /var/www/ticketharbor>
+    <Directory /var/www/EOTS>
         AllowOverride All
         Require all granted
     </Directory>
@@ -207,8 +207,8 @@ cd ticketharbor-main
 ```nginx
 server {
     listen 443 ssl;
-    server_name ticketharbor.yourdomain.com;
-    root /var/www/ticketharbor;
+    server_name EOTS.yourdomain.com;
+    root /var/www/EOTS;
     index index.php;
 
     ssl_certificate /path/to/your/certificate.crt;
@@ -231,11 +231,11 @@ server {
 
 ```sql
 -- Create database
-CREATE DATABASE ticketharbor CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE EOTS CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 -- Create user
-CREATE USER 'ticketharbor'@'localhost' IDENTIFIED BY 'your_secure_password';
-GRANT ALL PRIVILEGES ON ticketharbor.* TO 'ticketharbor'@'localhost';
+CREATE USER 'EOTS'@'localhost' IDENTIFIED BY 'your_secure_password';
+GRANT ALL PRIVILEGES ON EOTS.* TO 'EOTS'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
@@ -265,8 +265,8 @@ Edit your database connection settings in `src/bootstrap.php` or create a config
 ```php
 // Database configuration
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'ticketharbor');
-define('DB_USER', 'ticketharbor');
+define('DB_NAME', 'EOTS');
+define('DB_USER', 'EOTS');
 define('DB_PASS', 'your_secure_password');
 ```
 
@@ -327,17 +327,17 @@ To automatically process emails, set up a cron job:
 ```bash
 # Add to crontab (crontab -e)
 # Process emails every 5 minutes
-*/5 * * * * /usr/bin/php /var/www/ticketharbor/_script/process_emails.php
+*/5 * * * * /usr/bin/php /var/www/EOTS/_script/process_emails.php
 
 # Daily cleanup and maintenance
-0 2 * * * /usr/bin/php /var/www/ticketharbor/_script/daily_maintenance.php
+0 2 * * * /usr/bin/php /var/www/EOTS/_script/daily_maintenance.php
 ```
 
 ## Usage
 
 ### For End Users
 
-1. **Login**: Navigate to your TicketHarbor URL and click "Login with Microsoft"
+1. **Login**: Navigate to your EOTS URL and click "Login with Microsoft"
 2. **View Tickets**: See all your tickets on the dashboard
 3. **Create Tickets**: Send emails to the configured support address
 4. **Track Progress**: Monitor ticket status and receive email notifications
@@ -363,7 +363,7 @@ To automatically process emails, set up a cron job:
 
 ## API Documentation
 
-TicketHarbor provides RESTful APIs for integration:
+EOTS provides RESTful APIs for integration:
 
 ### Authentication
 All API requests require authentication via Bearer token or API key.
@@ -424,7 +424,7 @@ For detailed API documentation, visit `/api/docs` after installation.
 ### Log Files
 
 Check these locations for troubleshooting:
-- Application logs: `/var/www/ticketharbor/log/`
+- Application logs: `/var/www/EOTS/log/`
 - Web server logs: `/var/log/apache2/` or `/var/log/nginx/`
 - PHP logs: `/var/log/php/`
 
@@ -438,7 +438,7 @@ Check these locations for troubleshooting:
 
 ## Contributing
 
-We welcome contributions to TicketHarbor! Please follow these guidelines:
+We welcome contributions to EOTS! Please follow these guidelines:
 
 ### Development Setup
 
@@ -474,7 +474,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ### Third-Party Components
 
-TicketHarbor includes several third-party components:
+EOTS includes several third-party components:
 - **Smarty Template Engine**: Licensed under LGPL
 - **PHPMailer**: Licensed under LGPL
 - **Various JavaScript libraries**: See individual license files

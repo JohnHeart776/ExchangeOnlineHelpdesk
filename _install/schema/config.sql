@@ -1,7 +1,7 @@
 /*M!999999\- enable the sandbox mode */
 -- MariaDB dump 10.19-11.8.2-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: dev_ticketharbor_net
+-- Host: localhost    Database: EOTS
 -- ------------------------------------------------------
 -- Server version	11.8.2-MariaDB-deb12
 

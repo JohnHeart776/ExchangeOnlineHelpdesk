@@ -1,8 +1,8 @@
 <?php
 /**
- * TicketHarbor Installation Script
+ * EOTS Installation Script
  * 
- * This script handles the initial setup of the TicketHarbor system.
+ * This script handles the initial setup of the EOTS system.
  * It performs the following steps:
  * 1. Check database environment variables
  * 2. Initialize database schema
