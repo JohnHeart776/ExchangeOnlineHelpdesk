@@ -32,9 +32,10 @@ class GraphMail
 	public ?string $userEmail = null;
 
 	/**
-	 * Erstellt ein GraphMail Objekt aus Microsoft Graph API Maildaten.
+	 * Creates a GraphMail object from Microsoft Graph API mail data.
 	 *
-	 * @param array $item Die E-Mail-Daten aus der Graph API
+	 * @param array       $item The email data from the Graph API
+	 * @param string|null $userEmail
 	 * @return GraphMail
 	 */
 	public static function fromGraphData(array $item, ?string $userEmail = null): self
@@ -131,7 +132,7 @@ class GraphMail
 
 
 	/**
-	 * Wandelt ein GraphMail Objekt in ein Mail Objekt um.
+	 * Converts a GraphMail object into a Mail object.
 	 *
 	 * @return \Mail
 	 */

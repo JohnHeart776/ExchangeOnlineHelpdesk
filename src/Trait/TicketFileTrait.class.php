@@ -33,14 +33,18 @@ trait TicketFileTrait
 		return new User($this->getUserIdAsInt());
 	}
 
-	public function hasUser()
+	public function hasUser(): bool
 	{
 		return $this->getUserIdAsBool();
 	}
 
 	public function getCreatedDatetimeAsDateTime(): DateTime
 	{
-		return new DateTime($this->getCreatedDatetime());
+		try {
+			return new DateTime($this->getCreatedDatetime());
+		} catch (\Exception $e) {
+			throw new \Exception("Failed to create DateTime from created datetime: " . $e->getMessage());
+		}
 	}
 
 	public function isAccessLevelPublic(): bool

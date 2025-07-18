@@ -1,11 +1,34 @@
 <?php
 
 // Error reporting configuration
-const ERROR_MAIL_TO = 'christopher.pfaffinger@nv.at';
+define('ERROR_MAIL_TO', getenv('ERROR_MAIL_TO') ?: 'admin@example.com');
 if (PHP_SAPI === 'cli') {
-	define('ERROR_REPORTING_TO_MAIL_ENABLED', true);;
+	define('ERROR_REPORTING_TO_MAIL_ENABLED', true);
 } else { //debug.reporting.error.mail.recipient
 	define('ERROR_REPORTING_TO_MAIL_ENABLED', false);
+}
+
+// Shared error template to avoid duplication
+function getErrorTemplate(): string {
+	static $template = null;
+	if ($template === null) {
+		$template = '
+		<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+			<h2 style="color: #d32f2f; margin-top: 0;">%s Report</h2>
+			<div style="background-color: #fff; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);">
+				<p><strong>%s Type:</strong> %s</p>
+				<p><strong>Message:</strong> %s</p>
+				<p><strong>File:</strong> %s</p>
+				<p><strong>Line:</strong> %d</p>
+				<p><strong>Time:</strong> %s</p>
+				<div style="margin-top: 20px;">
+					<h3 style="color: #666;">Stack Trace:</h3>
+					<pre style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;">%s</pre>
+				</div>
+			</div>
+		</div>';
+	}
+	return $template;
 }
 
 
@@ -19,25 +42,12 @@ function customErrorHandler($errno, $errstr, $errfile, $errline)
 	$stack_trace = print_r(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), true);
 	$timestamp = date('Y-m-d H:i:s');
 
-	$html_template = '
-		<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
-			<h2 style="color: #d32f2f; margin-top: 0;">Error Report</h2>
-			<div style="background-color: #fff; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);">
-				<p><strong>Error Type:</strong> [%s] %s</p>
-				<p><strong>File:</strong> %s</p>
-				<p><strong>Line:</strong> %d</p>
-				<p><strong>Time:</strong> %s</p>
-				<div style="margin-top: 20px;">
-					<h3 style="color: #666;">Stack Trace:</h3>
-					<pre style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;">%s</pre>
-				</div>
-			</div>
-		</div>';
-
 	$formatted_error = sprintf(
-		$html_template,
-		$errno,
-		$errstr,
+		getErrorTemplate(),
+		'Error',
+		'Error',
+		"[{$errno}] {$errstr}",
+		'',
 		$errfile,
 		$errline,
 		$timestamp,
@@ -73,24 +83,10 @@ function customExceptionHandler($exception)
 	$timestamp = date('Y-m-d H:i:s');
 	$stack_trace = $exception->getTraceAsString();
 
-	$html_template = '
-		<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
-			<h2 style="color: #d32f2f; margin-top: 0;">Exception Report</h2>
-			<div style="background-color: #fff; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.12);">
-				<p><strong>Exception Type:</strong> %s</p>
-				<p><strong>Message:</strong> %s</p>
-				<p><strong>File:</strong> %s</p>
-				<p><strong>Line:</strong> %d</p>
-				<p><strong>Time:</strong> %s</p>
-				<div style="margin-top: 20px;">
-					<h3 style="color: #666;">Stack Trace:</h3>
-					<pre style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;">%s</pre>
-				</div>
-			</div>
-		</div>';
-
 	$formatted_error = sprintf(
-		$html_template,
+		getErrorTemplate(),
+		'Exception',
+		'Exception',
 		get_class($exception),
 		$exception->getMessage(),
 		$exception->getFile(),
@@ -137,7 +133,7 @@ register_shutdown_function(function () {
 			date('Y-m-d H:i:s')
 		);
 
-		if (ERROR_REPORTING_ENABLED) {
+		if (ERROR_REPORTING_TO_MAIL_ENABLED) {
 			error_log($error_message);
 			mail(ERROR_MAIL_TO, 'Application Fatal Error Report', $error_message);
 		}
@@ -189,5 +185,3 @@ $s->setCompileDir(__DIR__ . '/../smarty/templates_c/');
 $s->setCacheDir(__DIR__ . '/../smarty/cache/');
 if (isTestServer())
 	$s->force_compile = true;
-
-

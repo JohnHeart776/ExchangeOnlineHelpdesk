@@ -2,6 +2,9 @@
 
 trait StatusTrait
 {
+	use JsonSerializableTrait;
+	use EntityRelationshipTrait;
+	use BooleanCheckTrait;
 
 	public function getBadge()
 	{
@@ -10,17 +13,16 @@ trait StatusTrait
 
 	public function isOpen(): bool
 	{
-		return $this->getIsOpenAsInt() > 0;
+		return $this->isBooleanFieldTrue('getIsOpenAsInt');
 	}
 
-	public function toJsonObject()
+	public function toJsonObject(): array
 	{
-		return [
-			"guid" => $this->getGuid(),
+		return array_merge($this->getBaseJsonFields(), [
 			"name" => $this->getPublicName(),
 			"color" => $this->getColor(),
 			"icon" => $this->getIcon(),
-		];
+		]);
 	}
 
 	/**
@@ -28,7 +30,7 @@ trait StatusTrait
 	 */
 	public function hasCustomerNotificationTemplate(): bool
 	{
-		return $this->getCustomerNotificationTemplateIdAsInt() > 0;
+		return $this->hasEntityById('getCustomerNotificationTemplateId');
 	}
 
 	/**
@@ -36,7 +38,7 @@ trait StatusTrait
 	 */
 	public function hasAgentNotificationTemplate(): bool
 	{
-		return $this->getAgentNotificationTemplateIdAsInt() > 0;
+		return $this->hasEntityById('getAgentNotificationTemplateId');
 	}
 
 	/**
@@ -44,7 +46,7 @@ trait StatusTrait
 	 */
 	public function getCustomerNotificationTemplate(): NotificationTemplate
 	{
-		return new NotificationTemplate($this->getCustomerNotificationTemplateIdAsInt());
+		return $this->getEntityById('NotificationTemplate', 'getCustomerNotificationTemplateId');
 	}
 
 	/**
@@ -52,12 +54,12 @@ trait StatusTrait
 	 */
 	public function getAgentNotificationTemplate(): NotificationTemplate
 	{
-		return new NotificationTemplate($this->getAgentNotificationTemplateIdAsInt());
+		return $this->getEntityById('NotificationTemplate', 'getAgentNotificationTemplateId');
 	}
 
 	public function isFinal()
 	{
-		return $this->getIsFinalAsInt() > 0;
+		return $this->isBooleanFieldTrue('getIsFinalAsInt');
 	}
 
 	public function isClosed()

@@ -20,7 +20,7 @@ trait TicketActionItemTrait
 		return $this->getActionItemIdAsInt() > 0;
 	}
 
-	public function toJsonObject()
+	public function toJsonObject(): array
 	{
 		return [
 			"guid" => $this->getGuid(),
@@ -31,12 +31,12 @@ trait TicketActionItemTrait
 		];
 	}
 
-	public function isCompleted()
+	public function isCompleted(): bool
 	{
 		return $this->getCompletedAsInt() > 0;
 	}
 
-	public function toggleCompleted()
+	public function toggleCompleted(): void
 	{
 		if ($this->isCompleted()) {
 			$this->setUncompleted();
@@ -47,7 +47,7 @@ trait TicketActionItemTrait
 		$this->spawn();
 	}
 
-	public function setUncompleted()
+	public function setUncompleted(): void
 	{
 		$this->setNull("Completed");
 		$this->setNull("CompletedAt");
@@ -55,7 +55,7 @@ trait TicketActionItemTrait
 		$this->spawn();
 	}
 
-	public function setCompleted()
+	public function setCompleted(): void
 	{
 		$this->update("Completed", 1);
 		$this->update("CompletedAt", date("Y-m-d H:i:s"));
@@ -73,7 +73,7 @@ trait TicketActionItemTrait
 		return new User($this->getCompletedByUserIdAsInt());
 	}
 
-	public function delete()
+	public function delete(): void
 	{
 		global $d;
 		$_q = "DELETE FROM TicketActionItem WHERE TicketActionItemId = :id";

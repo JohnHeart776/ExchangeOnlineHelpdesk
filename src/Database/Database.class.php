@@ -56,23 +56,36 @@ class DatabaseQueryException extends DatabaseException
 
 class Database
 {
+	private static ?self $instance = null;
 	private ?mysqli $link;
 	private ?PDO $pdo;
+	private array $dbConfig;
 
 	public static function getInstance(): self
 	{
-		return new self();
+		if (self::$instance === null) {
+			self::$instance = new self();
+		}
+		return self::$instance;
 	}
 
 	public function __construct()
 	{
-		$dbhost = getenv('DBHOST');
-		$dbuser = getenv('DBUSER');
-		$dbpassword = getenv('DBPASSWORD');
-		$dbname = getenv('DBNAME');
+		// Cache database configuration to avoid repeated getenv() calls
+		$this->dbConfig = [
+			'host' => getenv('DBHOST'),
+			'user' => getenv('DBUSER'),
+			'password' => getenv('DBPASSWORD'),
+			'name' => getenv('DBNAME')
+		];
+
+		// Validate required environment variables
+		if (!$this->dbConfig['host'] || !$this->dbConfig['user'] || !$this->dbConfig['name']) {
+			throw new DatabaseConnectException("Missing required database environment variables (DBHOST, DBUSER, DBNAME)");
+		}
 
 		// MySQLi-Verbindung herstellen
-		$this->link = new mysqli($dbhost, $dbuser, $dbpassword, $dbname);
+		$this->link = new mysqli($this->dbConfig['host'], $this->dbConfig['user'], $this->dbConfig['password'], $this->dbConfig['name']);
 		if ($this->link->connect_errno) {
 			throw new DatabaseConnectException("MySQLi connection error: " . $this->link->connect_error);
 		}
@@ -81,18 +94,8 @@ class Database
 			throw new DatabaseCharsetException("Error loading character set utf8mb4: " . $this->link->error);
 		}
 
-		// PDO-Verbindung herstellen
-		$dsn = "mysql:host={$dbhost};dbname={$dbname};charset=utf8mb4";
-		$options = [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-		];
-
-		try {
-			$this->pdo = new PDO($dsn, $dbuser, $dbpassword, $options);
-		} catch (PDOException $ex) {
-			throw new DatabaseConnectException("PDO connection error: " . $ex->getMessage(), "", $ex);
-		}
+		// PDO connection will be created lazily when first needed
+		$this->pdo = null;
 	}
 
 	/**
@@ -106,12 +109,39 @@ class Database
 	}
 
 	/**
-	 * Gibt die PDO-Verbindung zurück.
+	 * Erstellt die PDO-Verbindung bei Bedarf (lazy loading).
+	 *
+	 * @return void
+	 * @throws DatabaseConnectException
+	 */
+	private function initializePDOConnection(): void
+	{
+		if ($this->pdo !== null) {
+			return;
+		}
+
+		// Use cached database configuration instead of repeated getenv() calls
+		$dsn = "mysql:host={$this->dbConfig['host']};dbname={$this->dbConfig['name']};charset=utf8mb4";
+		$options = [
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+		];
+
+		try {
+			$this->pdo = new PDO($dsn, $this->dbConfig['user'], $this->dbConfig['password'], $options);
+		} catch (PDOException $ex) {
+			throw new DatabaseConnectException("PDO connection error: " . $ex->getMessage(), "", $ex);
+		}
+	}
+
+	/**
+	 * Gibt die PDO-Verbindung zurück (erstellt sie bei Bedarf).
 	 *
 	 * @return PDO|null
 	 */
 	public function getPDOConnection(): ?PDO
 	{
+		$this->initializePDOConnection();
 		return $this->pdo;
 	}
 
@@ -150,14 +180,17 @@ class Database
 	}
 
 	/**
-	 * Führt einen Query über PDO aus.
+	 * Helper method to prepare and execute PDO statements
 	 *
 	 * @param string $_q
+	 * @param array $params
 	 * @return PDOStatement
 	 * @throws DatabaseQueryException
 	 */
-	public function queryPDO(string $_q, array $params = []): PDOStatement
+	private function executePDOStatement(string $_q, array $params = []): PDOStatement
 	{
+		$this->initializePDOConnection();
+
 		try {
 			if (!empty($params)) {
 				$stmt = $this->pdo->prepare($_q);
@@ -175,6 +208,18 @@ class Database
 			throw new DatabaseQueryException("PDO query error: " . $ex->getMessage(), $_q, $ex);
 		}
 		return $stmt;
+	}
+
+	/**
+	 * Führt einen Query über PDO aus.
+	 *
+	 * @param string $_q
+	 * @return PDOStatement
+	 * @throws DatabaseQueryException
+	 */
+	public function queryPDO(string $_q, array $params = []): PDOStatement
+	{
+		return $this->executePDOStatement($_q, $params);
 	}
 
 	/**
@@ -218,22 +263,7 @@ class Database
 	 */
 	public function getPDO(string $_q, array $params = [], bool $single = false): mixed
 	{
-		try {
-			if (!empty($params)) {
-				$stmt = $this->pdo->prepare($_q);
-				if (!$stmt) {
-					throw new DatabaseQueryException(
-						"PDO prepare error: " . implode(", ", $this->pdo->errorInfo()),
-						$_q
-					);
-				}
-				$stmt->execute($params);
-			} else {
-				$stmt = $this->pdo->query($_q);
-			}
-		} catch (PDOException $ex) {
-			throw new DatabaseQueryException("PDO query error: " . $ex->getMessage(), $_q, $ex);
-		}
+		$stmt = $this->executePDOStatement($_q, $params);
 
 		if ($single) {
 			return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -269,6 +299,7 @@ class Database
 	 */
 	public function filterPDO($_string): string
 	{
+		$this->initializePDOConnection();
 		$quoted = $this->pdo->quote($_string);
 		return substr($quoted, 1, -1);
 	}
@@ -300,13 +331,29 @@ class Database
 	 */
 	public function countPDO($_query): int
 	{
+		$this->initializePDOConnection();
 		try {
 			$stmt = $this->pdo->query($_query);
 		} catch (PDOException $ex) {
 			throw new DatabaseQueryException("PDO query error: " . $ex->getMessage(), $_query, $ex);
 		}
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		return count($rows);
+
+		// Use rowCount() for better performance instead of fetching all rows
+		// Note: For SELECT statements, rowCount() behavior varies by database
+		// For more reliable counting, we could wrap the query in SELECT COUNT(*) FROM (...)
+		$rowCount = $stmt->rowCount();
+
+		// If rowCount() returns 0 or unreliable result for SELECT, fall back to fetching
+		if ($rowCount === 0 && stripos(trim($_query), 'SELECT') === 0) {
+			// For SELECT queries, count rows by iterating without storing data
+			$count = 0;
+			while ($stmt->fetch(PDO::FETCH_NUM)) {
+				$count++;
+			}
+			return $count;
+		}
+
+		return $rowCount;
 	}
 
 	/**
@@ -327,6 +374,7 @@ class Database
 	 */
 	public function lastInsertIdFromPdo(): string|int|null
 	{
+		$this->initializePDOConnection();
 		if ($this->pdo) {
 			return $this->pdo->lastInsertId();
 		}

@@ -20,47 +20,47 @@ class TicketTextCleaner
 	 */
 	public static function cleanOld(string $html): string
 	{
-		// DOM-Dokument erstellen und HTML laden (mit Fehlerunterdrückung für schlechtes HTML)
+		// Create DOM document and load HTML (with error suppression for malformed HTML)
 		$dom = new DOMDocument('1.0', 'UTF-8');
 		libxml_use_internal_errors(true);
 		// Set UTF-8 header to ensure correct display of special characters and umlauts.
-		$htmlToLoad = $html;
+		$htmlContent = $html;
 		if (stripos($html, '<html') === false) {
 			// If no complete HTML document exists, add basic structure
-			$htmlToLoad = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head><body>{$html}</body></html>";
+			$htmlContent = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head><body>{$html}</body></html>";
 		}
-		$dom->loadHTML($htmlToLoad);
+		$dom->loadHTML($htmlContent);
 		libxml_clear_errors();
 
 		// XPath für DOM erstellen
 		$xpath = new DOMXPath($dom);
 
-		// Entfernen aller nicht sichtbaren/irrelevanten Knoten:
-		// Script-, Style-, Kopf-Bereich und Kommentar-Knoten werden aus dem DOM gelöscht.
+		// Remove all invisible/irrelevant nodes:
+		// Script, style, head area and comment nodes are deleted from the DOM.
 		foreach ($xpath->query('//script|//style|//noscript|//template|//head|//title|//meta|//base|//comment()') as $node) {
 			$node->parentNode?->removeChild($node);
 		}
-		// Entfernen von Elementen, die per CSS unsichtbar sind (display:none oder visibility:hidden)
+		// Remove elements that are invisible via CSS (display:none or visibility:hidden)
 		foreach ($xpath->query('//*[@style]') as $node) {
 			$style = $node->getAttribute('style');
 			if (stripos($style, 'display:none') !== false || stripos($style, 'visibility:hidden') !== false) {
 				$node->parentNode?->removeChild($node);
 			}
 		}
-		// Entfernen von Elementen mit HTML5 hidden-Attribut oder aria-hidden="true"
+		// Remove elements with HTML5 hidden attribute or aria-hidden="true"
 		foreach ($xpath->query('//*[@hidden] | //*[@aria-hidden="true"]') as $node) {
 			$node->parentNode?->removeChild($node);
 		}
-		// Entfernen von Formular-Elementen, die im Klartext keinen Sinn ergeben
+		// Remove form elements that don't make sense in plain text
 		foreach ($xpath->query('//input|//button|//select|//textarea') as $node) {
 			$node->parentNode?->removeChild($node);
 		}
 
-		// Rekursive Hilfsfunktion, die einen DOMNode in Klartext umwandelt.
+		// Recursive helper function that converts a DOMNode to plain text.
 		$nodeToText = function (\DOMNode $node, int $listLevel = 0) use (&$nodeToText): string {
 			$text = '';
 			if ($node instanceof \DOMText) {
-				// Textnode: Inhalt übernehmen
+				// Text node: Get content
 				$content = $node->wholeText;
 				if (!preg_match('/^\s+$/', $content)) {
 					$content = preg_replace('/[ \t\r\n]+/', ' ', $content) ?? $content;
@@ -71,8 +71,8 @@ class TicketTextCleaner
 				$tag = strtolower($node->tagName);
 				switch ($tag) {
 					case 'br':
-						// Zeilenumbruch-Tag
-						return "\n";
+						// Line break tag
+					return "\n";
 					case 'p':
 					case 'div':
 					case 'section':
@@ -99,8 +99,8 @@ class TicketTextCleaner
 						$index = 1;
 						foreach ($node->childNodes as $child) {
 							if ($child instanceof \DOMElement && strtolower($child->tagName) === 'li') {
-								// Präfix je nach Listentyp und Einrückung bestimmen
-								$prefix = str_repeat('    ', $listLevel)  // 4 Leerzeichen pro Listennesting-Ebene
+								// Determine prefix based on list type and indentation
+								$prefix = str_repeat('    ', $listLevel)  // 4 spaces per list nesting level
 									. ($isOrdered ? ($index . '. ') : '- ');
 								$itemText = '';
 								foreach ($child->childNodes as $grandChild) {
@@ -227,8 +227,8 @@ class TicketTextCleaner
 		$plainText = array_map('trim', $plainText);
 		$plainText = implode("\n", $plainText);
 
-		$plainText = preg_replace('/\A(\s*\n)+/u', '', $plainText); // Leere Zeilen am Anfang
-		$plainText = preg_replace('/(\s*\n)+\z/u', '', $plainText); // Leere Zeilen am Ende
+		$plainText = preg_replace('/\A(\s*\n)+/u', '', $plainText); // Empty lines at start
+		$plainText = preg_replace('/(\s*\n)+\z/u', '', $plainText); // Empty lines at end
 
 		$plainText = self::replaceSignatureBlocks($plainText);
 		return $plainText;
@@ -236,13 +236,13 @@ class TicketTextCleaner
 
 	public static function replaceSignatureBlocks(string $text): string
 	{
-		// Signaturen im Blockmodus finden
+		// Signatures
 		$pattern = '/
 		^([^\n]+)\n                # Name
 		([^\n]+)\n                 # Position
-		.*?                        # beliebige Zeilen dazwischen
-		Tel\.\s*[^\d]*([\d\/\- ]*(\d{4,5})).*?  # Telefonnummer
-		E-?mail:\s*([^\s<]+@[^>\s]+)            # E-Mail-Adresse
+		.*?                        # chars inbetween
+		Tel\.\s*[^\d]*([\d\/\- ]*(\d{4,5})).*?  # Phone
+		E-?mail:\s*([^\s<]+@[^>\s]+)            # Mail
 	/imsx';
 
 		$text = preg_replace_callback($pattern, function ($m) {
@@ -295,7 +295,7 @@ class TicketTextCleaner
 			$rows[] = $cells;
 		}
 
-		// Spaltenbreiten berechnen
+		// Calculate column widths
 		$colWidths = [];
 		foreach ($rows as $row) {
 			foreach ($row as $i => $cell) {
@@ -312,7 +312,7 @@ class TicketTextCleaner
 			$line = '';
 			foreach ($row as $i => $cell) {
 				$width = $colWidths[$i] ?? 10;
-				$line .= str_pad($cell, $width + 2); // +2 Padding
+				$line .= str_pad($cell, $width + 2); // +2 for padding
 			}
 			$lines[] = rtrim($line);
 		}
@@ -325,7 +325,7 @@ class TicketTextCleaner
 	 */
 	private static function applyDatabaseReplacements(string $text): string
 	{
-		// Harmonisiere Zeilenumbrüche im Zieltext
+		// Harmonize line breaks in target text
 		$text = str_replace(["\r\n", "\r"], "\n", $text);
 
 		foreach (TextReplaceController::getAll() as $textReplace) {

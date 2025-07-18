@@ -4,15 +4,15 @@ use JetBrains\PhpStorm\Pure;
 
 trait FileTrait
 {
+	use JsonSerializableTrait;
 
-	public function toJsonObject()
+	public function toJsonObject(): array
 	{
-		return [
-			"guid" => $this->getGuid(),
+		return array_merge($this->getBaseJsonFields(), [
 			"name" => $this->getName(),
 			"sha256" => $this->getHashSha256(),
 			"link" => $this->getLink(),
-		];
+		]);
 	}
 
 	public function getDataAsBase64()

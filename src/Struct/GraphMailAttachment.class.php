@@ -27,7 +27,7 @@ class GraphMailAttachment
 	}
 
 	/**
-	 * Wandelt ein GraphMailAttachment in ein normales MailAttachment um
+	 * Converts a GraphMailAttachment into a regular MailAttachment
 	 */
 	public function toMailAttachment(): \MailAttachment
 	{

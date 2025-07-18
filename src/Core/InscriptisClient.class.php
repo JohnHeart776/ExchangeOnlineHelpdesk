@@ -3,17 +3,17 @@
 class InscriptisClient
 {
 	/**
-	 * URL des Inscriptis-Services.
+	 * URL of the Inscriptis service.
 	 *
 	 * @var string
 	 */
 	private $serviceUrl;
 
 	/**
-	 * Konstruktor.
+	 * Constructor.
 	 *
-	 * @param string $domain  Die Domain des Inscriptis-Services, z. B. "localhost:5000".
-	 * @param bool   $useHttp Optional: true für HTTP, false (Standard) für HTTPS.
+	 * @param string $domain  The domain of the Inscriptis service, e.g. "localhost:5000".
+	 * @param bool   $useHttp Optional: true for HTTP, false (default) for HTTPS.
 	 */
 	public function __construct(string $domain, bool $useHttp = false)
 	{
@@ -22,18 +22,18 @@ class InscriptisClient
 	}
 
 	/**
-	 * Wandelt einen HTML-String in reinen Text um, indem der Inscriptis-Service verwendet wird.
+	 * Converts an HTML string to plain text using the Inscriptis service.
 	 *
-	 * @param string $html Der HTML-String, der konvertiert werden soll.
-	 * @return string Der resultierende Text.
-	 * @throws Exception Falls ein Fehler bei der Anfrage oder der Verarbeitung auftritt.
+	 * @param string $html The HTML string to be converted.
+	 * @return string The resulting text.
+	 * @throws Exception If an error occurs during the request or processing.
 	 */
 	public function convertHtmlToText(string $html): string
 	{
 		$ch = curl_init();
 
 		if ($ch === false) {
-			throw new Exception('cURL konnte nicht initialisiert werden.');
+			throw new Exception('cURL could not be initialized.');
 		}
 
 		// cURL-Optionen setzen
@@ -60,7 +60,7 @@ class InscriptisClient
 		curl_close($ch);
 
 		if ($httpCode !== 200) {
-			throw new Exception("HTTP-Fehler: Code {$httpCode}. Antwort: " . $response);
+			throw new Exception("HTTP error: Code {$httpCode}. Response: " . $response);
 		}
 
 		return $response;

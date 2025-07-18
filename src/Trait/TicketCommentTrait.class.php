@@ -2,6 +2,10 @@
 
 trait TicketCommentTrait
 {
+	use JsonSerializableTrait;
+	use EntityRelationshipTrait;
+	use BooleanCheckTrait;
+
 	/**
 	 * @return stdClass|null
 	 */
@@ -9,12 +13,18 @@ trait TicketCommentTrait
 	{
 		if (!$this->hasGraphObject())
 			return null;
-		return json_decode($this->getGraphObject());
+
+		$decoded = json_decode($this->getGraphObject());
+		if (json_last_error() !== JSON_ERROR_NONE) {
+			throw new \Exception("Failed to decode graph object JSON: " . json_last_error_msg());
+		}
+
+		return $decoded;
 	}
 
 	public function hasGraphObject(): bool
 	{
-		return strlen($this->GetGraphObject()) > 1 && $this->GetGraphObject() !== null;
+		return strlen($this->getGraphObject()) > 1 && $this->getGraphObject() !== null;
 	}
 
 	/**
@@ -31,31 +41,27 @@ trait TicketCommentTrait
 
 	public function hasMail(): bool
 	{
-		return $this->getMailIdAsInt() > 0;
+		return $this->hasEntityById('getMailId');
 	}
 
 	public function getMail(): ?Mail
 	{
-		if (!$this->hasMail())
-			return null;
-		return new Mail($this->getMailIdAsInt());
+		return $this->getEntityById('Mail', 'getMailId');
 	}
 
 	public function hasUser(): bool
 	{
-		return $this->getUserIdAsInt() > 0;
+		return $this->hasEntityById('getUserId');
 	}
 
 	public function getUser(): ?User
 	{
-		if (!$this->hasUser())
-			return null;
-		return new User($this->getUserIdAsInt());
+		return $this->getEntityById('User', 'getUserId');
 	}
 
 	public function getUserIdAsInt(): int
 	{
-		return $this->getUserId();
+		return $this->getIdAsInt('getUserId');
 	}
 
 	/**
@@ -71,26 +77,24 @@ trait TicketCommentTrait
 
 	public function isTextTypeTxt(): bool
 	{
-		return $this->getTextType() == "txt";
+		return $this->isTextType("txt");
 	}
 
 	public function isTextTypeHtml(): bool
 	{
-		return $this->getTextType() == "html";
+		return $this->isTextType("html");
 	}
 
-	public function toJsonObject()
+	public function toJsonObject(): array
 	{
-		return [
-			"guid" => $this->getGuid(),
-			"created" => $this->getCreatedDatetimeAsDateTime()->format("Y-m-d H:i:s"),
+		return array_merge($this->getBaseJsonFields(), [
 			"text" => $this->getText(),
-		];
+		]);
 	}
 
 	public function isOfFacilityUser(): bool
 	{
-		return $this->getFacility() == "user";
+		return $this->isFieldEqualTo('getFacility', "user");
 	}
 
 	public function isPublicAccessLevel(): bool

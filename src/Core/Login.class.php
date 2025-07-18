@@ -142,8 +142,10 @@ class Login
 	 * @param int    $expiresIn
 	 * @return void
 	 */
-	public static function startSession(User $user, string $accessToken, string $refreshToken, int $expiresIn = 3600): true
+	public static function startSession(User $user, string $accessToken, string $refreshToken, int $expiresIn = 3600): void
 	{
+		// Regenerate session ID for security (prevent session fixation)
+		session_regenerate_id(true);
 
 		$_SESSION['access_token'] = $accessToken;
 		$_SESSION['refresh_token'] = $refreshToken;
@@ -154,8 +156,6 @@ class Login
 		$_SESSION['AzureObjectId'] = $user->AzureObjectId;
 
 		$_SESSION["user"] = $user;
-
-		return true;
 	}
 
 	public static function loginUserFromGraphResponse(array  $graphData,
@@ -220,7 +220,11 @@ class Login
 
 	public static function logout(): void
 	{
+		// Clear all authentication-related session variables
 		unset(
+			$_SESSION['user'],
+			$_SESSION['UserId'],
+			$_SESSION['AzureObjectId'],
 			$_SESSION['user_guid'],
 			$_SESSION['access_token'],
 			$_SESSION['refresh_token'],
@@ -229,6 +233,8 @@ class Login
 			$_SESSION['user_name']
 		);
 
+		// Regenerate session ID for security
+		session_regenerate_id(true);
 	}
 
 	/**
@@ -237,14 +243,11 @@ class Login
 	public static function requireLogin(): void
 	{
 		if (!self::isLoggedIn()) {
-			$redirectTarget = $_SERVER['REQUEST_URI'] ?? '/';
-			$encodedTarget = urlencode($redirectTarget);
-			header("Location: /login.php?from={$encodedTarget}");
-			exit;
+			self::bringToLogin(useCurrentPageAsRedirectTarget: true);
 		}
 	}
 
-	public static function isGuest()
+	public static function isGuest(): bool
 	{
 		if (!self::isLoggedIn()) {
 			return false;
@@ -252,7 +255,7 @@ class Login
 		return self::getUser()->GetUserRole() == "guest";
 	}
 
-	public static function isUser()
+	public static function isUser(): bool
 	{
 		if (!self::isLoggedIn()) {
 			return false;
@@ -264,7 +267,7 @@ class Login
 		return self::getUser()->GetUserRole() == "user";
 	}
 
-	public static function isAgent()
+	public static function isAgent(): bool
 	{
 		if (!self::isLoggedIn()) {
 			return false;
@@ -276,7 +279,7 @@ class Login
 		return self::getUser()->isAgent();
 	}
 
-	public static function isAdmin()
+	public static function isAdmin(): bool
 	{
 		if (!self::isLoggedIn()) {
 			return false;
@@ -325,31 +328,40 @@ class Login
 	}
 
 
-	public static function bringtToDashboard()
+	public static function bringToDashboard(): void
 	{
-		Header("Location: /dashboard/");
-		die();
+		header("Location: /dashboard/");
+		exit;
 	}
 
 	public static function bringToLogin(
 		?string $redirectTarget = null,
 		?bool   $useCurrentPageAsRedirectTarget = null,
-		?string $message = null)
+		?string $message = null): void
 	{
 		if ($useCurrentPageAsRedirectTarget) {
-			$redirectTarget = $_SERVER['REQUEST_URI'];
-			$encodedTarget = urlencode($redirectTarget);
-			Header("Location: /login/?from={$encodedTarget}" . ($message ? "&message=" . urlencode($message) : ""));
-			die();
+			$redirectTarget = $_SERVER['REQUEST_URI'] ?? '/';
+			// Validate redirect target to prevent header injection
+			$redirectTarget = filter_var($redirectTarget, FILTER_SANITIZE_URL);
 		}
 
+		$location = '/login/';
+		$params = [];
+
 		if ($redirectTarget) {
-			$encodedTarget = urlencode($redirectTarget);
-			Header("Location: /login/?from={$encodedTarget}" . ($message ? "&message=" . urlencode($message) : ""));
-		} else {
-			Header("Location: /login/" . ($message ? "?message=" . urlencode($message) : ""));
+			$params['from'] = $redirectTarget;
 		}
-		die();
+
+		if ($message) {
+			$params['message'] = $message;
+		}
+
+		if (!empty($params)) {
+			$location .= '?' . http_build_query($params);
+		}
+
+		header("Location: {$location}");
+		exit;
 	}
 
 }

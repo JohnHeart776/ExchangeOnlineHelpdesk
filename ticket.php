@@ -23,7 +23,7 @@ if (login::isAgent()) {
 
 	$myOUser = login::getUser()->getOrganizationUser();
 	if (!$myOUser)
-		die("Wir haben einen Fehler gefunden aber wollen ihn nicht behalten. (0x13)");
+		die("We found an error but we don't want to keep it. (0x13)");
 
 	//check if i am in the ticket associates
 	$amILinked = false;
@@ -32,7 +32,7 @@ if (login::isAgent()) {
 			$amILinked = true;
 
 	if (!$amILinked)
-		die("Du hast keine Rechte um auf dieses Ticket zuzugreifen.");
+		die("You don't have permission to access this ticket.");
 
 	$ticketFiles = [];
 	if ($ticket->hasTicketFiles()) {

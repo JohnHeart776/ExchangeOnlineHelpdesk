@@ -949,4 +949,15 @@ trait TicketTrait
 		return $response;
 	}
 
+	/**
+	 * Get a wrapper for ticket status history that provides access to status changes
+	 * and time calculations between status changes
+	 * 
+	 * @return TicketStatusHistoryWrapper
+	 */
+	public function getStatusHistoryWrapper(): TicketStatusHistoryWrapper
+	{
+		return new TicketStatusHistoryWrapper($this->getTicketIdAsInt());
+	}
+
 }

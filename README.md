@@ -66,9 +66,11 @@ EOTS is an enterprise-grade ticket management solution that seamlessly integrate
 
 ## System Architecture
 
+### High-Level Architecture
+
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Microsoft     │    │   EOTS   │    │   Database      │
+│   Microsoft     │    │   EOTS           │    │   Database      │
 │   Graph API     │◄──►│   Application    │◄──►│   (MariaDB)     │
 │                 │    │                  │    │                 │
 │ • Mail Fetching │    │ • Ticket Mgmt    │    │ • Tickets       │
@@ -84,6 +86,563 @@ EOTS is an enterprise-grade ticket management solution that seamlessly integrate
                        │ • Azure AI       │
                        │ • Auto-responses │
                        └──────────────────┘
+```
+
+### Detailed System Components
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           EOTS Application Layer                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Web Interface Layer                                                        │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │  Dashboard  │  │   Tickets   │  │   Reports   │  │    Admin    │        │
+│  │   (PHP)     │  │   (PHP)     │  │   (PHP)     │  │   (PHP)     │        │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  API Layer                                                                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │   /api/me   │  │ /api/user   │  │ /api/agent  │  │ /api/admin  │        │
+│  │  (REST)     │  │  (REST)     │  │  (REST)     │  │  (REST)     │        │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Business Logic Layer                                                       │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │   Ticket    │  │    Mail     │  │    User     │  │  Category   │        │
+│  │   Manager   │  │  Processor  │  │   Manager   │  │   Manager   │        │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  Data Access Layer                                                          │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
+│  │  Database   │  │   Config    │  │    Auth     │  │   Traits    │        │
+│  │   Classes   │  │   Manager   │  │   Manager   │  │  (Shared)   │        │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘        │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Data Structure and Relationships
+
+### Core Entity Relationship Diagram
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│      User       │    │   Organization  │    │    Category     │
+│                 │    │      User       │    │                 │
+│ • UserId (PK)   │    │                 │    │ • CategoryId    │
+│ • Guid          │    │ • OrgUserId     │    │ • InternalName  │
+│ • AzureObjectId │    │ • AzureObjectId │    │ • PublicName    │
+│ • DisplayName   │    │ • DisplayName   │    │ • Icon/Color    │
+│ • UserRole      │    │ • Mail          │    │ • IsDefault     │
+│ • TenantId      │    │ • Department    │    └─────────────────┘
+└─────────────────┘    └─────────────────┘             │
+         │                       │                     │
+         │                       │                     │
+         ▼                       ▼                     ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                           Ticket                                │
+│                                                                 │
+│ • TicketId (PK)              • StatusId (FK)                   │
+│ • Guid                       • CategoryId (FK)                 │
+│ • TicketNumber               • AssigneeUserId (FK)             │
+│ • ConversationId             • CreatedDatetime                 │
+│ • Subject                    • UpdatedDatetime                 │
+│ • MessengerName/Email        • DueDatetime                     │
+└─────────────────────────────────────────────────────────────────┘
+         │                       │                     │
+         ▼                       ▼                     ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ TicketComment   │    │  TicketStatus   │    │   TicketFile    │
+│                 │    │                 │    │                 │
+│ • CommentId     │    │ • StatusId      │    │ • FileId        │
+│ • TicketId (FK) │    │ • TicketId (FK) │    │ • TicketId (FK) │
+│ • UserId (FK)   │    │ • OldStatusId   │    │ • UserId (FK)   │
+│ • Text          │    │ • NewStatusId   │    │ • AccessLevel   │
+│ • AccessLevel   │    │ • UserId (FK)   │    │ • CreatedAt     │
+│ • Facility      │    │ • Comment       │    └─────────────────┘
+│ • MailId (FK)   │    │ • CreatedAt     │
+└─────────────────┘    └─────────────────┘
+         │
+         ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│      Mail       │    │ MailAttachment  │    │     Status      │
+│                 │    │                 │    │                 │
+│ • MailId (PK)   │    │ • AttachmentId  │    │ • StatusId (PK) │
+│ • AzureId       │    │ • MailId (FK)   │    │ • InternalName  │
+│ • MessageId     │    │ • Name          │    │ • PublicName    │
+│ • TicketId (FK) │    │ • ContentType   │    │ • Color/Icon    │
+│ • Subject       │    │ • Size          │    │ • IsOpen        │
+│ • SenderEmail   │    │ • Content       │    │ • IsFinal       │
+│ • Body          │    │ • HashSha256    │    │ • IsDefault     │
+│ • ConversationId│    └─────────────────┘    └─────────────────┘
+└─────────────────┘
+```
+
+### Data Flow Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Email Processing Flow                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Microsoft Graph API
+         │
+         ▼ (Fetch Emails)
+┌─────────────────┐
+│   GraphMail     │ ──────► Parse email headers, body, attachments
+│   Structure     │         Extract conversation ID, sender info
+└─────────────────┘
+         │
+         ▼ (Convert)
+┌─────────────────┐
+│   Mail Object   │ ──────► Store in Mail table
+│   (Database)    │         Link to existing conversation
+└─────────────────┘
+         │
+         ▼ (Process)
+┌─────────────────┐
+│ Ticket Creation │ ──────► Create new ticket OR
+│   or Update     │         Add to existing ticket
+└─────────────────┘
+         │
+         ▼ (Categorize)
+┌─────────────────┐
+│ AI Categorization│ ─────► Auto-assign category
+│ & Classification │        Suggest priority/urgency
+└─────────────────┘
+         │
+         ▼ (Notify)
+┌─────────────────┐
+│  Notifications  │ ──────► Email notifications
+│   & Updates     │         Status updates
+└─────────────────┘
+```
+
+## Process Flows and Workflows
+
+### Authentication Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Microsoft OAuth2 Authentication                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+User Access Request
+         │
+         ▼
+┌─────────────────┐
+│  Check Session  │ ──No──► Redirect to Microsoft Login
+│   (Login.php)   │
+└─────────────────┘
+         │ Yes
+         ▼
+┌─────────────────┐
+│ Validate Token  │ ──Invalid──► Force Re-authentication
+│  & Permissions  │
+└─────────────────┘
+         │ Valid
+         ▼
+┌─────────────────┐
+│  Load User      │ ──────► Check User Role:
+│  Profile &      │         • Guest (limited access)
+│  Role           │         • User (own tickets)
+└─────────────────┘         • Agent (assigned tickets)
+         │                  • Admin (full access)
+         ▼
+┌─────────────────┐
+│ Grant Access    │ ──────► Route to appropriate dashboard
+│ to Dashboard    │
+└─────────────────┘
+```
+
+### Ticket Lifecycle Management
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           Ticket Lifecycle                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Email Received ──────► Mail Processing ──────► Ticket Creation/Update
+     │                      │                         │
+     ▼                      ▼                         ▼
+┌─────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ New Email   │    │ Parse & Store   │    │ Create Ticket   │
+│ in Mailbox  │    │ in Mail Table   │    │ or Add Comment  │
+└─────────────┘    └─────────────────┘    └─────────────────┘
+                            │                         │
+                            ▼                         ▼
+                   ┌─────────────────┐    ┌─────────────────┐
+                   │ Extract         │    │ AI Categorization│
+                   │ Attachments     │    │ & Auto-Assignment│
+                   └─────────────────┘    └─────────────────┘
+                                                   │
+                                                   ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Ticket Status Flow                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  New ──────► Assigned ──────► In Progress ──────► Waiting for Customer     │
+│   │             │                  │                        │               │
+│   │             ▼                  ▼                        ▼               │
+│   │         Working ──────► Customer Reply ──────► Resolved ──────► Closed │
+│   │                                                    │                    │
+│   └─────────────────► Cancelled ◄─────────────────────┘                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### User Interaction Workflows
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          User Role Workflows                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   End User      │    │     Agent       │    │  Administrator  │
+│   Workflow      │    │   Workflow      │    │    Workflow     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ • View own      │    │ • View assigned │    │ • System config │
+│   tickets       │    │   tickets       │    │ • User mgmt     │
+│ • Create new    │    │ • Update status │    │ • Category mgmt │
+│   tickets       │    │ • Add comments  │    │ • Status mgmt   │
+│ • Add comments  │    │ • Assign to     │    │ • Reports       │
+│ • Upload files  │    │   other agents  │    │ • AI config     │
+│ • View status   │    │ • Close tickets │    │ • Mail settings │
+└─────────────────┘    │ • Generate      │    │ • Template mgmt │
+                       │   responses     │    │ • Audit logs    │
+                       └─────────────────┘    └─────────────────┘
+```
+
+### AI Integration Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        AI Processing Pipeline                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+New Email/Ticket Content
+         │
+         ▼
+┌─────────────────┐
+│ Content Analysis│ ──────► Extract key information:
+│ (OpenAI/Azure)  │         • Subject classification
+└─────────────────┘         • Urgency detection
+         │                  • Language detection
+         ▼                  • Sentiment analysis
+┌─────────────────┐
+│ Category        │ ──────► Match against:
+│ Suggestion      │         • CategorySuggestion rules
+└─────────────────┘         • Historical patterns
+         │                  • Keyword filters
+         ▼
+┌─────────────────┐
+│ Auto-Response   │ ──────► Generate:
+│ Generation      │         • Acknowledgment emails
+└─────────────────┘         • Suggested replies
+         │                  • Status updates
+         ▼
+┌─────────────────┐
+│ Cache Results   │ ──────► Store in AiCache table
+│ & Apply         │         Apply suggestions to ticket
+└─────────────────┘
+```
+
+## Technical Implementation Details
+
+### Directory Structure and Components
+
+```
+src/
+├── Application/          # Core business logic classes
+│   ├── Ticket.class.php     # Main ticket management
+│   ├── Mail.class.php       # Email processing
+│   ├── User.class.php       # User management
+│   ├── Category.class.php   # Ticket categorization
+│   ├── Status.class.php     # Status management
+│   └── ...
+├── Auth/                 # Authentication and authorization
+│   ├── MicrosoftAuth.php    # OAuth2 implementation
+│   └── Permissions.php      # Role-based access control
+├── Client/               # External API clients
+│   ├── GraphClient.php      # Microsoft Graph API client
+│   ├── OpenAiClient.php     # OpenAI API integration
+│   └── AzureAiClient.php    # Azure AI services
+├── Controller/           # MVC controllers
+│   ├── TicketController.php # Ticket operations
+│   ├── UserController.php   # User operations
+│   └── ApiController.php    # API endpoints
+├── Core/                 # Core utilities and helpers
+│   ├── Database.class.php   # Database abstraction
+│   ├── Login.class.php      # Session management
+│   ├── DateHelper.class.php # Date/time utilities
+│   └── GuidHelper.class.php # GUID generation
+├── Struct/               # Data structures
+│   ├── GraphMail.class.php  # Email data structure
+│   ├── GraphUser.class.php  # User data structure
+│   └── Enums/               # Enumeration classes
+└── Trait/                # Reusable code traits
+    ├── TicketTrait.class.php
+    ├── MailTemplateTrait.class.php
+    └── JsonSerializableTrait.class.php
+```
+
+### API Endpoint Structure
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            API Endpoints                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+/api/me/                  # Current user operations
+├── GET    /profile       # Get current user profile
+├── GET    /tickets       # Get user's tickets
+├── POST   /tickets       # Create new ticket
+└── PUT    /tickets/{id}  # Update user's ticket
+
+/api/user/                # User-specific operations
+├── GET    /{id}          # Get user details
+├── GET    /{id}/tickets  # Get user's tickets
+└── POST   /{id}/notify   # Send notification
+
+/api/agent/               # Agent operations
+├── GET    /tickets       # Get assigned tickets
+├── PUT    /tickets/{id}  # Update ticket status
+├── POST   /tickets/{id}/assign  # Assign ticket
+├── POST   /tickets/{id}/comment # Add comment
+└── GET    /dashboard     # Agent dashboard data
+
+/api/admin/               # Administrative operations
+├── GET    /users         # List all users
+├── POST   /users         # Create user
+├── GET    /categories    # List categories
+├── POST   /categories    # Create category
+├── GET    /status        # List statuses
+├── POST   /status        # Create status
+├── GET    /config        # System configuration
+└── PUT    /config        # Update configuration
+
+/api/organizationuser/    # Organization user sync
+├── GET    /             # List org users
+├── POST   /sync         # Sync with Azure AD
+└── GET    /{id}         # Get org user details
+```
+
+### Database Design Patterns
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Database Patterns                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. GUID-based Security
+   • Every entity has a GUID for secure external references
+   • Primary keys remain internal integers for performance
+   • URLs use GUIDs to prevent enumeration attacks
+
+2. Audit Trail Pattern
+   • TicketStatus table tracks all status changes
+   • CreatedAt/UpdatedAt timestamps on all entities
+   • User tracking for all modifications
+
+3. Soft Delete Pattern
+   • Enabled/Disabled flags instead of hard deletes
+   • Maintains referential integrity
+   • Allows for data recovery and audit trails
+
+4. Conversation Threading
+   • ConversationId links emails to tickets
+   • Maintains email thread continuity
+   • Supports multi-participant conversations
+
+5. Access Control Pattern
+   • AccessLevel enum (Public/Internal) on comments and files
+   • Role-based permissions (Guest/User/Agent/Admin)
+   • Hierarchical access control
+
+6. Caching Strategy
+   • AiCache table for expensive AI operations
+   • Configuration caching in Config table
+   • Template caching for email notifications
+```
+
+### Security Implementation
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Security Measures                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Authentication:
+├── Microsoft OAuth2 integration
+├── JWT token validation
+├── Session management with secure cookies
+└── Multi-tenant support with TenantId isolation
+
+Authorization:
+├── Role-based access control (RBAC)
+├── Resource-level permissions
+├── API endpoint protection
+└── Data filtering based on user role
+
+Data Protection:
+├── GUID-based external references
+├── SHA256 hashing for file integrity
+├── Encrypted file storage with multiple secrets
+├── SQL injection prevention with prepared statements
+└── XSS protection with input sanitization
+
+Communication Security:
+├── HTTPS enforcement
+├── Certificate-based Graph API authentication
+├── Secure email transmission
+└── API rate limiting and throttling
+```
+
+## Development and Deployment Guide
+
+### Development Environment Setup
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      Development Workflow                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. Environment Preparation
+   ├── PHP 8.1+ with required extensions
+   ├── MariaDB/MySQL database server
+   ├── Web server (Apache/Nginx)
+   └── SSL certificate for OAuth2 callbacks
+
+2. Database Setup
+   ├── Import schema.sql for table structure
+   ├── Import category.sql for default categories
+   ├── Import status.sql for ticket statuses
+   ├── Import config.sql for system configuration
+   └── Import menu.sql for navigation structure
+
+3. Configuration
+   ├── Set environment variables (DBHOST, DBUSER, etc.)
+   ├── Configure Microsoft Graph API credentials
+   ├── Set up OAuth2 applications in Azure AD
+   ├── Configure AI service API keys (OpenAI/Azure)
+   └── Set up email notification templates
+
+4. Testing
+   ├── Run PHPUnit tests: phpunit --testdox
+   ├── Test email processing with sample emails
+   ├── Verify OAuth2 authentication flow
+   └── Test AI integration and categorization
+```
+
+### Deployment Architecture Options
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        Deployment Patterns                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Single Server Deployment:
+┌─────────────────┐
+│   Web Server    │ ──────► All components on one server
+│ • PHP App       │         Suitable for small organizations
+│ • Database      │         Easy to manage and maintain
+│ • File Storage  │
+└─────────────────┘
+
+Multi-Tier Deployment:
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Web Tier      │    │  Application    │    │   Database      │
+│ • Load Balancer │◄──►│     Tier        │◄──►│     Tier        │
+│ • Web Servers   │    │ • PHP Servers   │    │ • MariaDB       │
+│ • SSL Termination│    │ • File Storage  │    │ • Replication   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+
+Cloud Deployment (Azure):
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Azure App     │    │   Azure SQL     │    │  Azure Storage  │
+│    Service      │◄──►│   Database      │    │   Account       │
+│ • Auto-scaling  │    │ • Managed       │    │ • File Storage  │
+│ • SSL included  │    │ • Backup        │    │ • CDN           │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Performance Optimization
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     Performance Considerations                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Database Optimization:
+├── Index optimization for frequent queries
+├── Query optimization for ticket searches
+├── Connection pooling for high concurrency
+├── Read replicas for reporting queries
+└── Partitioning for large mail tables
+
+Application Optimization:
+├── Smarty template compilation caching
+├── OpCache for PHP bytecode caching
+├── Redis/Memcached for session storage
+├── CDN for static assets
+└── Gzip compression for responses
+
+Email Processing Optimization:
+├── Batch processing for multiple emails
+├── Asynchronous processing with queues
+├── Rate limiting for Graph API calls
+├── Caching for AI categorization results
+└── Parallel processing for attachments
+
+Monitoring and Logging:
+├── Application performance monitoring
+├── Database query performance tracking
+├── Email processing metrics
+├── AI service usage monitoring
+└── Security event logging
+```
+
+### Maintenance and Operations
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      Operational Procedures                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Regular Maintenance:
+├── Database backup and recovery procedures
+├── Log rotation and cleanup
+├── Certificate renewal automation
+├── Security updates and patches
+└── Performance monitoring and tuning
+
+Troubleshooting Common Issues:
+├── Email processing failures
+│   └── Check Graph API credentials and permissions
+├── Authentication problems
+│   └── Verify OAuth2 configuration and certificates
+├── Database connection issues
+│   └── Check connection strings and firewall rules
+├── AI service failures
+│   └── Verify API keys and rate limits
+└── File upload problems
+    └── Check file permissions and storage limits
+
+Backup Strategy:
+├── Database: Daily automated backups with point-in-time recovery
+├── Files: Regular backup of uploaded attachments and logs
+├── Configuration: Version control for configuration files
+└── Certificates: Secure backup of SSL and API certificates
+
+Scaling Considerations:
+├── Horizontal scaling with load balancers
+├── Database read replicas for reporting
+├── CDN for static content delivery
+├── Queue systems for background processing
+└── Microservices architecture for large deployments
 ```
 
 ## Prerequisites

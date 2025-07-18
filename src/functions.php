@@ -1,11 +1,24 @@
 <?php
 
-function is_decimal($val)
+/**
+ * Check if a value is a decimal number (has fractional part)
+ *
+ * @param mixed $val Value to check
+ * @return bool True if value is decimal, false otherwise
+ */
+function is_decimal($val): bool
 {
 	return is_numeric($val) && floor($val) != $val;
 }
 
-function formatNumber(float $number, int $decimals)
+/**
+ * Format a number with German locale formatting (comma as decimal separator, dot as thousands separator)
+ *
+ * @param float $number Number to format
+ * @param int $decimals Number of decimal places (automatically set to 0 for integers)
+ * @return string Formatted number string
+ */
+function formatNumber(float $number, int $decimals): string
 {
 	if (!is_decimal($number))
 		$decimals = 0;
@@ -27,7 +40,13 @@ function getHttpXForwardedForHeader(): ?string
 	return null;
 }
 
-function getClientIP()
+/**
+ * Get the client's IP address, considering proxy headers
+ * Prioritizes X-Forwarded-For header over REMOTE_ADDR for proxy compatibility
+ *
+ * @return string Client IP address or empty string if not available
+ */
+function getClientIP(): string
 {
 	if (getHttpXForwardedForHeader()) {
 		return getHttpXForwardedForHeader();
@@ -89,7 +108,13 @@ function slugify($text): string
 	return $text;
 }
 
-function file_extension($filename)
+/**
+ * Parse a filename into its components (name and extension)
+ *
+ * @param string $filename The filename to parse
+ * @return array{filename: string, extension: string, extension_undotted: string} Array containing filename parts
+ */
+function file_extension(string $filename): array
 {
 	$x = explode('.', $filename);
 	$ext = end($x);
@@ -178,20 +203,15 @@ function getHttpHost(): string
 	return $_SERVER["HTTP_HOST"];
 }
 
-function getMimeType($filename)
+/**
+ * Get MIME type of a file
+ *
+ * @param string $filename Path to the file
+ * @return string|false MIME type string or false if not determinable
+ */
+function getMimeType(string $filename): string|false
 {
 	$mimetype = false;
-
-	/*if (function_exists('finfo_fopen'))
-	{
-		// open with FileInfo
-	} elseif (function_exists('getimagesize'))
-	{
-		// open with GD
-	} elseif (function_exists('exif_imagetype'))
-	{
-		// open with EXIF
-	} else*/
 
 	if (function_exists('mime_content_type')) {
 		$mimetype = mime_content_type($filename);
@@ -223,7 +243,13 @@ function guid()
 	return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
-function fage($path)
+/**
+ * Get file age in seconds (time since last modification)
+ *
+ * @param string $path Path to the file
+ * @return int File age in seconds, or 9999999 if file doesn't exist
+ */
+function fage(string $path): int
 {
 	if (!file_exists($path)) {
 		return 9999999;
@@ -420,16 +446,30 @@ function widthForStringUsingFontSize($string, $font, $fontSize)
 	return $stringWidth;
 }
 
-function inRange($int, $min, $max)
+/**
+ * Check if a number is within a range (exclusive)
+ *
+ * @param int|float $int Number to check
+ * @param int|float $min Minimum value (exclusive)
+ * @param int|float $max Maximum value (exclusive)
+ * @return bool True if number is within range, false otherwise
+ */
+function inRange(int|float $int, int|float $min, int|float $max): bool
 {
 	return ($min < $int && $int < $max);
 }
 
-function color_inverse($color)
+/**
+ * Calculate the inverse color of a given hex color
+ *
+ * @param string $color Hex color code (with or without #)
+ * @return string Inverted hex color code with # prefix, or #000000 if invalid input
+ */
+function color_inverse(string $color): string
 {
 	$color = str_replace('#', '', $color);
 	if (strlen($color) != 6) {
-		return '000000';
+		return '#000000';
 	}
 	$rgb = '';
 	for ($x = 0; $x < 3; $x++) {
@@ -578,46 +618,6 @@ function getLatestGitHead()
 	return $id;
 }
 
-// Bad performance
-function getLatestGitHeadLegacyFOpen()
-{
-	$file = __DIR__ . "/../.git/logs/HEAD";
-	if (!file_exists($file))
-		return uniqid();
-
-	$line = '';
-
-	$f = fopen($file, 'r');
-	$cursor = -1;
-
-	fseek($f, $cursor, SEEK_END);
-	$char = fgetc($f);
-
-	/**
-	 * Trim trailing newline chars of the file
-	 */
-	while ($char === "\n" || $char === "\r") {
-		fseek($f, $cursor--, SEEK_END);
-		$char = fgetc($f);
-	}
-
-	/**
-	 * Read until the start of file or first newline char
-	 */
-	while ($char !== false && $char !== "\n" && $char !== "\r") {
-		/**
-		 * Prepend the new char
-		 */
-		$line = $char . $line;
-		fseek($f, $cursor--, SEEK_END);
-		$char = fgetc($f);
-	}
-
-	fclose($f);
-
-	$id = explode(" ", $line)[1];
-	return $id;
-}
 
 function smartyDie($param)
 {
@@ -690,4 +690,3 @@ function dumpStructure($var, $indent = 0) {
 		echo $indentStr . "-- " . gettype($var) . PHP_EOL;
 	}
 }
-

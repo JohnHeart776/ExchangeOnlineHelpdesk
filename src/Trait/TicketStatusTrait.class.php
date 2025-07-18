@@ -15,7 +15,7 @@ trait TicketStatusTrait
 
 	public function hasUser(): bool
 	{
-		return $this->GetUserId() > 0;
+		return $this->getUserId() > 0;
 	}
 
 }

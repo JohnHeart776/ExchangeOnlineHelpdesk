@@ -16,7 +16,7 @@ if (login::isAgent()) {
 	$user = login::getUser();
 	$ouser = $user->getOrganizationUser();
 	if (!$ouser)
-		die("Wir haben einen Fehler gefunden. (13)");
+		die("We found an error. (13)");
 
 	$tas = $ouser->getTicketAssociates();
 	$tickets = array_map(fn($ta) => $ta->getTicket(), $tas);
@@ -27,7 +27,7 @@ if (login::isAgent()) {
 
 	$s->assign("user", $user);
 	$s->assign("ouser", $ouser);
-	$s->assign("title", "Meine Tickets");
+	$s->assign("title", "My Tickets");
 	$s->assign("content", "user_dashboard");
 }
 
