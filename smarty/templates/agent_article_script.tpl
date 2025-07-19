@@ -13,9 +13,9 @@
 				},
 				success: function (response) {
 					if (response.status)
-						toastr.success('Inhalt erfolgreich gespeichert');
+						toastr.success('Content saved successfully');
 					else
-						toastr.error('Fehler beim Speichern des Inhalts');
+						toastr.error('Error saving content');
 				},
 				error: function (xhr, status, error) {
 					toastr.error('Error saving content');
@@ -26,11 +26,11 @@
 
 		$("#generateArticle").on("click", function () {
 			Swal.fire({
-				title: 'Artikel generieren',
+				title: 'Generate Article',
 				input: 'text',
-				inputLabel: 'Worum soll es in dem Artikel gehen?',
+				inputLabel: 'What should the article be about?',
 				showCancelButton: true,
-				confirmButtonText: 'Generieren'
+				confirmButtonText: 'Generate'
 			}).then((result) => {
 				if (result.isConfirmed) {
 					$.blockUI();
@@ -43,11 +43,11 @@
 						success: function (response) {
 							$.unblockUI();
 							tinymce.activeEditor.setContent(response.data.content);
-							toastr.success('Artikel erfolgreich generiert');
+							toastr.success('Article generated successfully');
 						},
 						error: function (xhr, status, error) {
 							$.unblockUI();
-							toastr.error('Fehler beim Generieren des Artikels');
+							toastr.error('Error generating article');
 						}
 					});
 				}

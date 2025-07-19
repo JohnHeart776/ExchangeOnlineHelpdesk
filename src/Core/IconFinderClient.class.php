@@ -3,7 +3,7 @@
 class IconFinderClient
 {
 	/**
-	 * Iconfinder API Endpunkt
+	 * Iconfinder API Endpoint
 	 * @var string
 	 */
 	private $apiBase = 'https://api.iconfinder.com/v4';
@@ -21,7 +21,7 @@ class IconFinderClient
 	private $apiKey;
 
 	/**
-	 * Konstruktor
+	 * Constructor
 	 *
 	 * @param string $clientId
 	 * @param string $apiKey
@@ -33,15 +33,15 @@ class IconFinderClient
 	}
 
 	/**
-	 * Sucht nach kostenlosen Icons und lädt das erste herunter.
+	 * Searches for free icons and downloads the first one.
 	 *
-	 * @param string $searchTerm Suchbegriff
-	 * @return string Icon-Daten als Blob
-	 * @throws Exception bei Fehlern
+	 * @param string $searchTerm Search term
+	 * @return string Icon data as blob
+	 * @throws Exception on errors
 	 */
 	public function getFirstFreeIconBlob(string $searchTerm): string
 	{
-		// 1. Suche das erste kostenlose Icon
+		// 1. Search for first free icon
 		$searchUrl = $this->apiBase . '/icons/search'
 			. '?query=' . urlencode($searchTerm)
 			. '&count=1'
@@ -51,20 +51,20 @@ class IconFinderClient
 		$data = json_decode($response, true);
 
 		if (empty($data['icons'][0])) {
-			throw new Exception('Kein kostenloses Icon gefunden für: ' . $searchTerm);
+			throw new Exception('No free icon found for: ' . $searchTerm);
 		}
 
 		$icon = $data['icons'][0];
 
-		// 2. Wähle eine Rastergröße (hier: erste verfügbare)
+		// 2. Select a raster size (here: first available)
 		if (empty($icon['raster_sizes'][0]['formats'])) {
-			throw new Exception('Keine Raster-Formate für das Icon gefunden.');
+			throw new Exception('No raster formats found for the icon.');
 		}
 
 		$formats = $icon['raster_sizes'][0]['formats'];
 		$downloadUrl = null;
 
-		// Suche PNG-Format, sonst erstes Format
+		// Look for PNG format, otherwise use first format
 		foreach ($formats as $fmt) {
 			if (isset($fmt['format']) && strtolower($fmt['format']) === 'png' && isset($fmt['download_url'])) {
 				$downloadUrl = $fmt['download_url'];
@@ -73,26 +73,26 @@ class IconFinderClient
 		}
 
 		if (!$downloadUrl) {
-			// Fallback: erstes Format
+			// Fallback: first format
 			$downloadUrl = $formats[0]['download_url'] ?? null;
 		}
 
 		if (!$downloadUrl) {
-			throw new Exception('Kein Download-Link gefunden für das Icon.');
+			throw new Exception('No download link found for the icon.');
 		}
 
-		// 3. Lade das Icon herunter
+		// 3. Download the icon
 		return $this->httpRequest('GET', $downloadUrl, [], false);
 	}
 
 	/**
-	 * Führt eine HTTP-Anfrage per cURL aus.
+	 * Executes an HTTP request via cURL.
 	 *
-	 * @param string $method GET oder POST
+	 * @param string $method GET or POST
 	 * @param string $url
-	 * @param array  $body   assoziatives Array für POST-Daten
-	 * @return string Raw-Antwort oder JSON-String
-	 * @throws Exception bei HTTP-Fehler
+	 * @param array  $body   associative array for POST data
+	 * @return string Raw response or JSON string
+	 * @throws Exception on HTTP error
 	 */
 	private function httpRequest(string $method, string $url, array $body = []): string
 	{

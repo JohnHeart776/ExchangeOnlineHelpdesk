@@ -9,7 +9,7 @@ if (!isset($_POST["guid"]))
 
 $category = new Category($_POST["guid"]);
 if (!$category->isValid())
-	die(jsonStatus(false, "Kategorie nicht gefunden."));
+	die(jsonStatus(false, "Kategorie not found."));
 
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 100;
 if ($limit < 1 || $limit > 1000) {

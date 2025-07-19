@@ -5,7 +5,7 @@ namespace Struct;
 class GraphUserImage
 {
 	public string $base64;
-	public string $mimeType = 'image/jpeg'; // Standard von Graph
+	public string $mimeType = 'image/jpeg'; // Default from Graph
 
 	public function __construct(string $binaryData)
 	{
@@ -13,7 +13,7 @@ class GraphUserImage
 	}
 
 	/**
-	 * Gibt das Bild als data URI zurück, direkt browserfähig.
+	 * Returns the image as data URI, directly browser-compatible.
 	 */
 	public function asDataUri(): string
 	{
@@ -21,7 +21,7 @@ class GraphUserImage
 	}
 
 	/**
-	 * Optional: Gibt reinen Base64-String zurück
+	 * Optional: Returns pure Base64 string
 	 */
 	public function getBase64(): string
 	{

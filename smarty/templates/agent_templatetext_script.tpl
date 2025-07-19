@@ -14,7 +14,7 @@
 			.done(function (data) {
 				if (data.status) {
 					Swal.fire({
-						text: 'Vorlageninhalt erfolgreich aktualisiert',
+						text: 'Template content successfully updated',
 						icon: 'success',
 						buttonsStyling: false,
 						confirmButtonText: 'Ok',
@@ -25,7 +25,7 @@
 					});
 				} else {
 					Swal.fire({
-						text: 'Vorlageninhalt konnte nicht aktualisiert werden',
+						text: 'Error updating template content',
 						icon: 'error',
 						buttonsStyling: false,
 						confirmButtonText: 'Ok',
@@ -38,7 +38,7 @@
 			})
 			.fail(function () {
 				Swal.fire({
-					text: 'Fehler beim Aktualisieren des Vorlageninhalts',
+					text: 'Error updating template content',
 					icon: 'error',
 					buttonsStyling: false,
 					confirmButtonText: 'Ok',
@@ -88,9 +88,9 @@
 					icon: 'success',
 					showDenyButton: true,
 					showCancelButton: true,
-					confirmButtonText: 'Vorhandenen ersetzen',
-					denyButtonText: 'Verwerfen',
-					cancelButtonText: 'An Cursor einfügen'
+					confirmButtonText: 'Replace existing',
+					denyButtonText: 'Discard',
+					cancelButtonText: 'Insert at cursor'
 				}).then((insertChoice) => {
 					const editor = tinymce.get('templatetext-content');
 					if (insertChoice.isConfirmed) {

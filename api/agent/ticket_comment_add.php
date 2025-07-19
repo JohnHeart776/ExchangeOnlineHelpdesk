@@ -6,10 +6,10 @@ Login::requireIsAgent();
 
 $ticket = new Ticket($_POST["ticket"]);
 if (!$ticket->isValid())
-	die(jsonStatus(false, "Ticket nicht gefunden."));
+	die(jsonStatus(false, "Ticket not found."));
 
 if (!isset($_POST["editor0"]))
-	die(jsonStatus(false, "Editor0 nicht gefunden."));
+	die(jsonStatus(false, "Editor0 not found."));
 
 $html = $_POST["editor0"];
 

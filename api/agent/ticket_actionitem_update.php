@@ -6,7 +6,7 @@ Login::requireIsAgent();
 
 $ticketActionItem = new TicketActionItem($_POST["pk"]);
 if (!$ticketActionItem->isValid())
-	die(jsonStatus(false, "Ticket-Aktionspunkt nicht gefunden."));
+	die(jsonStatus(false, "Ticket-Aktionspunkt not found."));
 
 $name = $_POST["name"];
 $value = $_POST["value"];

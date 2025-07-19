@@ -25,7 +25,7 @@
 					});
 				} else {
 					Swal.fire({
-						text: 'Fehler beim Aktualisieren des Vorlageninhalt',
+						text: 'Error updating template content',
 						icon: 'error',
 						buttonsStyling: false,
 						confirmButtonText: 'Ok',
@@ -57,11 +57,11 @@
 		const addToPrompt = $('#addToGeneratePrompt').val();
 
 		Swal.fire({
-			title: 'KI-Text generieren',
+			title: 'Generate AI Text',
 			input: 'text',
-			inputLabel: 'Welchen Text möchten Sie generieren?',
+			inputLabel: 'What text would you like to generate?',
 			showCancelButton: true,
-			confirmButtonText: 'Generieren',
+			confirmButtonText: 'Generate',
 			showLoaderOnConfirm: true,
 			preConfirm: (prompt) => {
 				return $.post('/api/agent/ai/generate.json', {
@@ -81,7 +81,7 @@
 		}).then((result) => {
 			if (result.isConfirmed) {
 				Swal.fire({
-					title: 'Generierter Text',
+					title: 'Generated Text',
 					text: result.value,
 					icon: 'success',
 					showDenyButton: true,

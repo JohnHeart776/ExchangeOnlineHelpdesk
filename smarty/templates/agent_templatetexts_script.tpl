@@ -5,13 +5,13 @@
 			e.preventDefault();
 
 			Swal.fire({
-				title: 'Neue Vorlage hinzufügen',
+				title: 'Add New Template',
 				html: `
-				                <input type="text" id="templateName" class="swal2-input" placeholder="Vorlagenname">
-				                <input type="text" id="templateDescription" class="swal2-input" placeholder="Beschreibung">
+				                <input type="text" id="templateName" class="swal2-input" placeholder="Template Name">
+				                <input type="text" id="templateDescription" class="swal2-input" placeholder="Description">
 				            `,
 				showCancelButton: true,
-				confirmButtonText: 'Hinzufügen',
+				confirmButtonText: 'Add',
 				preConfirm: () => {
 					return {
 						name: document.getElementById('templateName').value,
@@ -23,14 +23,14 @@
 					$.post('/api/agent/templatetext/add.json', result.value)
 						.done(function (response) {
 							if (response.status) {
-								Swal.fire('Erfolg', 'Vorlage erfolgreich hinzugefügt', 'success')
+								Swal.fire('Success', 'Template successfully added', 'success')
 									.then(() => location.reload());
 							} else {
-								Swal.fire('Fehler', response.message || 'Fehler beim Hinzufügen der Vorlage', 'error');
+								Swal.fire('Error', response.message || 'Error adding template', 'error');
 							}
 						})
 						.fail(function () {
-							Swal.fire('Fehler', 'Fehler beim Hinzufügen der Vorlage', 'error');
+							Swal.fire('Error', 'Error adding template', 'error');
 						});
 				}
 			});

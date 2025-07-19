@@ -4,12 +4,12 @@ class MailAttachmentController
 {
 
     /**
-     * Liefert alle Objekte aus der Tabelle.
-     *
-     * @param int $limit Optionales Limit (Standard: 0 = kein Limit)
-     * @param string|null $direction Optionaler Sortiermodus ("ASC" oder "DESC"), null = keine Sortierung
-     * @param string|null $sortBy Optionaler Spaltenname für die Sortierung, null = verwendet das erste Feld
-     * @return MailAttachment[]
+	 * Returns all objects from the table.
+	 *
+	 * @param int         $limit     Optional limit (default: 0 = no limit)
+	 * @param string|null $direction Optional sort mode ("ASC" or "DESC"), null = no sorting
+	 * @param string|null $sortBy    Optional column name for sorting, null = uses the first field
+	 * @return MailAttachment[]
      * @throws \Database\DatabaseQueryException
      */
     public static function getAll(int $limit = 0, ?string $direction = null, ?string $sortBy = null): array
@@ -17,14 +17,14 @@ class MailAttachmentController
         global $d;
         $_q = "SELECT `MailAttachmentId` FROM `MailAttachment`";
 
-        // Sortierung nur anwenden, wenn $direction gesetzt ist
+        // Apply sorting only if $direction is set
         if ($direction !== null) {
             $direction = strtoupper($direction);
             if ($direction !== "ASC" && $direction !== "DESC") {
                 throw new Exception("Invalid order parameter: " . $direction);
             }
 
-            // Falls kein Sortierfeld angegeben, benutze das erste Feld
+            // If no sort field specified, use the first field
             if ($sortBy === null) {
                 $sortBy = "MailAttachmentId";
             }
@@ -92,7 +92,7 @@ class MailAttachmentController
      * @param string $field
      * @param mixed $term
      * @param bool $fetchOne
-     * @param int $limit Optionales Limit (Standard: 0 = kein Limit)
+     * @param int $limit Optional limit (default: 0 = no limit)
      * @return MailAttachment|null|MailAttachment[]
      * @throws \Database\DatabaseQueryException
      */
@@ -101,11 +101,10 @@ class MailAttachmentController
         global $d;
         $allowed = ["MailAttachmentId", "Guid", "AzureId", "Secret1", "Secret2", "Secret3", "MailId", "Name", "ContentType", "Size", "IsInline", "HashSha256", "Content", "TextRepresentation", "CreatedAt"];
         if (!in_array($field, $allowed)) {
-            throw new Exception("Ungültiges Suchfeld: " . $field);
-        }
+			throw new Exception("Invalid search field: " . $field);
+		}
         $_q = "SELECT `MailAttachmentId` FROM `MailAttachment` WHERE `$field` LIKE \"".$d->filter($term)."\"";
 
-        // Optionales Limit anwenden, wenn nicht fetchOne
         if ($limit > 0 && !$fetchOne) {
             $_q .= " LIMIT " . $d->filter($limit);
         }
@@ -128,8 +127,8 @@ class MailAttachmentController
     }
 
     /**
-     * Überprüft, ob ein Element mit dem gegebenen Suchbegriff existiert.
-     *
+	 * Checks if an element exists with the given search term.
+	 *
      * @param string $field
      * @param string $term
      * @return bool
@@ -140,7 +139,7 @@ class MailAttachmentController
         global $d;
         $allowed = ["MailAttachmentId", "Guid", "AzureId", "Secret1", "Secret2", "Secret3", "MailId", "Name", "ContentType", "Size", "IsInline", "HashSha256", "Content", "TextRepresentation", "CreatedAt"];
         if (!in_array($field, $allowed)) {
-            throw new Exception("Ungültiges Suchfeld: " . $field);
+            throw new Exception("Invalid search field: " . $field);
         }
         $_q = "SELECT `MailAttachmentId` FROM `MailAttachment` WHERE `$field` LIKE \"%".$d->filter($term)."%\" LIMIT 1";
         $result = $d->get($_q, true);
@@ -148,16 +147,16 @@ class MailAttachmentController
     }
 
     /**
-     * Liefert zufällige Objekte aus der Tabelle.
-     *
-     * @param int $amount Anzahl der zurückzugebenden Datensätze (Standard: 1)
-     * @return MailAttachment[]
+	 * Returns random objects from the table.
+	 *
+	 * @param int $amount Number of records to return (default: 1)
+	 * @return MailAttachment[]
      * @throws \Database\DatabaseQueryException
      */
     public static function getRandom(int $amount = 1): array
     {
         global $d;
-        // Mindestens 1
+        // At least 1
         $amount = max(1, $amount);
         $_q = "SELECT `MailAttachmentId` FROM `MailAttachment` ORDER BY RAND() LIMIT " . $d->filter($amount) . ";";
         $results = $d->get($_q);
@@ -175,15 +174,15 @@ class MailAttachmentController
      */
     public static function save(MailAttachment $obj): ?MailAttachment {
         global $d;
-        // Überprüfe, ob der Primary Key (das erste Feld) leer ist
-        if (!empty($obj->MailAttachmentId)) {
+		// Check if the Primary Key (first field) is empty
+		if (!empty($obj->MailAttachmentId)) {
             throw new Exception("Primary Key must be empty");
         }
         if (!empty($obj->Guid)) {
             throw new Exception("GUID must be empty");
         }
-        // Setze CreatedAt und UpdatedAt mit dem dynamischen SQL-Wert NOW() falls vorhanden
-        // Baue die INSERT-Abfrage auf. Alle Spalten außer dem Primary Key werden genutzt.
+		// Set CreatedAt and UpdatedAt with the dynamic SQL value NOW() if available
+		// Build the INSERT query. All columns except the Primary Key are used.
         $cols = [];
         $vals = [];
         $cols[] = "`Guid`";

@@ -6,7 +6,7 @@ Login::requireIsAgent();
 
 $ticket = new Ticket($_POST["ticket"]);
 if (!$ticket->isValid())
-	die(jsonStatus(false, "Ticket nicht gefunden."));
+	die(jsonStatus(false, "Ticket not found."));
 
 $ticket->assignUser(login::getUser());
 $ticket->setStatus(TicketStatusHelper::getDefaultAssignedStatus()); //assign status to be assigned (so mails are tirggered)

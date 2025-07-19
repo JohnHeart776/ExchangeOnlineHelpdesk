@@ -5,7 +5,7 @@
 ### Environment Setup
 This project uses a custom PHP framework without Composer dependency management. The application requires:
 
-- **PHP 7.4+** (uses nullable type declarations and other modern PHP features)
+- **PHP 8.4+** (uses nullable type declarations and other modern PHP features)
 - **MySQL/MariaDB** with utf8mb4 charset support
 - **Web server** (Apache/Nginx) with PHP support
 

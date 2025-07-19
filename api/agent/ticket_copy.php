@@ -6,7 +6,7 @@ Login::requireIsAgent();
 
 $ticket = new Ticket($_POST['guid']);
 if (!$ticket->isValid()) {
-	die(jsonStatus(false, "Ticket nicht gefunden."));
+	die(jsonStatus(false, "Ticket not found."));
 }
 
 $newTicket = $ticket->copy();

@@ -29,7 +29,7 @@ class OpenAiReponse
 	public $system_fingerprint;
 
 	/**
-	 * Konstruktor zum Setzen der Werte
+	 * Constructor for setting the values
 	 */
 	public function __construct(
 		string  $id,
@@ -53,7 +53,7 @@ class OpenAiReponse
 	}
 
 	/**
-	 * Erstellt ein OpenAiReponse-Objekt aus einem OpenAI-JSON-String (oder decodiertem Array)
+	 * Creates an OpenAiReponse object from an OpenAI JSON string (or decoded array)
 	 *
 	 * @param string|array $json
 	 * @return static
@@ -64,7 +64,7 @@ class OpenAiReponse
 		if (is_string($json)) {
 			$data = json_decode($json, true);
 			if ($data === null) {
-				throw new \InvalidArgumentException("Ungültiger JSON-String übergeben.");
+ 			throw new \InvalidArgumentException("Invalid JSON string provided.");
 			}
 		} else {
 			$data = $json;
@@ -83,7 +83,7 @@ class OpenAiReponse
 	}
 
 	/**
-	 * Gibt die erste Choice (Message) zurück, falls vorhanden
+	 * Returns the first choice (message) if available
 	 *
 	 * @return array|null
 	 */
@@ -93,7 +93,7 @@ class OpenAiReponse
 	}
 
 	/**
-	 * Gibt den Content der ersten Choice zurück, falls vorhanden
+	 * Returns the content of the first choice if available
 	 *
 	 * @return string|null
 	 */
@@ -106,7 +106,7 @@ class OpenAiReponse
 	}
 
 	/**
-	 * Gibt das Usage-Array zurück
+	 * Returns the usage array
 	 * @return array
 	 */
 	public function getUsage(): array

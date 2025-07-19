@@ -12,7 +12,7 @@ trait MailAttachmentTrait
 	{
 		$updateResult = $this->update("MailId", $mail->MailId);
 		if (!$updateResult)
-			throw new \Exception("Fehler beim Speichern des MailAttachments");
+			throw new \Exception("Error while saving mail attachment");
 		$this->spawn();
 		return $updateResult;
 	}

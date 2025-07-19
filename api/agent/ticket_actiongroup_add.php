@@ -5,18 +5,18 @@ require_once __DIR__ . '/../../src/bootstrap.php';
 Login::requireIsAgent();
 
 if (!isset($_POST["ticket"]))
-	die(jsonStatus(false, "Ticket nicht gefunden."));
+	die(jsonStatus(false, "Ticket not found."));
 
 if (!isset($_POST["group"]))
-	die(jsonStatus(false, "Aktionsgruppe nicht ausgewählt."));
+	die(jsonStatus(false, "Actiongroup not selected."));
 
 $ticket = new Ticket($_POST["ticket"]);
 if (!$ticket->isValid())
-	die(jsonStatus(false, "Ticket nicht gefunden."));
+	die(jsonStatus(false, "Ticket not found."));
 
 $actionGroup = new ActionGroup($_POST["group"]);
 if (!$actionGroup->isValid())
-	die(jsonStatus(false, "Aktionsgruppe nicht gefunden."));
+	die(jsonStatus(false, "Actiongroup not found."));
 
 
 $newTicketActionItems = $ticket->addActionGroup($actionGroup);

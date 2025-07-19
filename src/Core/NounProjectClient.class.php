@@ -13,13 +13,13 @@ class NounProjectClient
 	}
 
 	/**
-	 * Sucht das erste Icon zu einem Suchbegriff und lädt es als rohen String (Bild-Bytes) herunter.
+	 * Searches for the first icon matching a search term and downloads it as a raw string (image bytes).
 	 *
-	 * @param string $term   Der Suchbegriff
-	 * @param string $format "png" oder "svg"
-	 * @param int    $size   Für PNG: Bildgröße (20–1200). Ignoriert bei SVG.
-	 * @return string        Rohdaten des Icons als Binary-String
-	 * @throws RuntimeException mit Debug-Infos; bei PNG-Fallback auf thumbnail_url
+	 * @param string $term   The search term
+	 * @param string $format "png" or "svg"
+	 * @param int    $size   For PNG: image size (20–1200). Ignored for SVG.
+	 * @return string        Raw icon data as binary string
+	 * @throws RuntimeException with debug info; for PNG fallback to thumbnail_url
 	 */
 	public function fetchIcon(string $term, string $format = 'png', int $size = 1200): string
 	{
@@ -62,7 +62,7 @@ class NounProjectClient
 				return $this->fetchUrl($icon['thumbnail_url']);
 			}
 			throw new \RuntimeException(
-				"SVG nicht verfügbar (nur Public-Domain-Icons liefern icon_url im Free-Plan)."
+				"SVG not available (only public domain icons provide icon_url in free plan)."
 			);
 		}
 
@@ -96,7 +96,7 @@ class NounProjectClient
 
 			if (empty($dl['base64_encoded_file'])) {
 				throw new \RuntimeException(
-					"Kein base64_encoded_file im Download-Response.\n"
+					"No base64_encoded_file in download response.\n"
 					. "Download response:\n{$downloadJson}"
 				);
 			}
@@ -104,7 +104,7 @@ class NounProjectClient
 			return base64_decode($dl['base64_encoded_file']);
 		}
 
-		throw new \InvalidArgumentException('Format muss "png" oder "svg" sein.');
+		throw new \InvalidArgumentException('Format must be "png" or "svg".');
 	}
 
 	/**

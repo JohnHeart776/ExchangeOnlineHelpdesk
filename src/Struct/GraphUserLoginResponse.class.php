@@ -17,9 +17,9 @@ class GraphUserLoginResponse {
 	public ?string $id;
 
 	/**
-	 * Konstruktor zur Initialisierung der Graph-Daten aus dem OAuth2-Response-Array.
+	 * Constructor to initialize Graph data from OAuth2 response array.
 	 *
-	 * @param array $data Das assoziative Array der Graph-Response.
+	 * @param array $data The associative array of the Graph response.
 	 */
 	public function __construct(array $data) {
 		$this->odataContext      = $data['@odata.context']    ?? null;
@@ -38,18 +38,18 @@ class GraphUserLoginResponse {
 	}
 
 	/**
-	 * Vergleicht die Graph-Daten mit den Feldern der User-Klasse und aktualisiert den User,
-	 * sofern Unterschiede festgestellt werden.
+	 * Compares Graph data with User class fields and updates the user
+	 * if differences are detected.
 	 *
-	 * Es wird ein Mapping verwendet, um die Graph-Felder den entsprechenden User-Feldern zuzuordnen.
-	 * Bei Unterschieden wird die update()-Methode der User-Klasse aufgerufen.
+	 * A mapping is used to associate Graph fields with corresponding User fields.
+	 * If differences are found, the update() method of the User class is called.
 	 *
-	 * @param \User $user Eine Instanz der User-Klasse.
+	 * @param \User $user An instance of the User class.
 	 */
 	public function compareAndUpdateUser(\User $user): void {
 		// Mapping von Graph-Daten zu User-Feldern
 		$mapping = [
-			'id'                => 'AzureObjectId',   // Graph "id" entspricht dem Azure Object Id
+			'id' => 'AzureObjectId',   // Graph "id" corresponds to Azure Object Id
 			'userPrincipalName' => 'Upn',
 			'displayName'       => 'DisplayName',
 			'givenName'         => 'Name',            // Graph "givenName" als Vorname
@@ -57,7 +57,7 @@ class GraphUserLoginResponse {
 			'jobTitle'          => 'Title',
 			'mail'              => 'Mail',
 			'mobilePhone'       => 'MobilePhone',
-			'businessPhones'    => 'BusinessPhones',  // Als kommaseparierten String gespeichert
+			'businessPhones' => 'BusinessPhones',  // Stored as comma-separated string
 			'officeLocation'    => 'OfficeLocation'
 		];
 
@@ -70,7 +70,7 @@ class GraphUserLoginResponse {
 			// Hole den aktuellen Wert aus der User-Instanz.
 			$userValue = $user->{$userField};
 
-			// Vergleiche und aktualisiere, wenn der Wert unterschiedlich ist.
+			// Compare and update if the value is different.
 			if ($userValue !== $graphValue) {
 				$user->update($userField, $graphValue);
 			}

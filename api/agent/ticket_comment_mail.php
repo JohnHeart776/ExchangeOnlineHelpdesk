@@ -7,9 +7,9 @@ Login::requireIsAgent();
 $tc = new TicketComment($_POST["ticketcomment"]);
 
 if (!$tc->isValid())
-	die(jsonStatus(false, "Ticketcomment nicht gefunden."));
+	die(jsonStatus(false, "Ticketcomment not found."));
 
 if (!$tc->hasMail())
-	die(jsonStatus(false, "Kein Mail-Body vorhanden."));
+	die(jsonStatus(false, "No Mail Body found."));
 
 echo jsonStatus(true, "", $tc->getMail()->exportAsJson());

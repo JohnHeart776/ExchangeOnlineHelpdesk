@@ -58,12 +58,12 @@ class Login
 		$_SESSION['expires_in'] = $exp - time();
 		$expiresAt = date('Y-m-d H:i:s', $exp);
 
-		// Noch gültig?
+		// Still valid?
 		if (time() < $exp - self::getTokenRefreshThreshold()) {
 			return;
 		}
 
-		// Token erneuern
+		// Renew token
 		try {
 			$tokenUrl = Config::getConfigValueFor('user.tokenUrl');
 
@@ -180,12 +180,12 @@ class Login
 		$graphUserLoginResponse = new \Struct\GraphUserLoginResponse($graphData);
 
 		if (empty($existingUser)) {
-			//user gibt es noch nicht!
+			//user does not exist yet!
 			$newUser = new User(0);
 			$newUser->fromGraphLoginResponseData($orgInfo, $graphData);
 			$User = UserController::save($newUser);
 		} else {
-			//den user gibts schon
+			//user already exists
 			$User = new User((int)$existingUser['UserId']);
 			$graphUserLoginResponse->compareAndUpdateUser($User);
 		}
@@ -312,7 +312,7 @@ class Login
 		if (!self::isAgent()) {
 			self::bringToLogin(
 				useCurrentPageAsRedirectTarget: true,
-				message: "Du musst Agent sein um dies zu tun. Bitte wende dich an deinen Administrator."
+				message: "You must be an Agent to do this. Please contact your administrator."
 			);
 		}
 	}
@@ -322,7 +322,7 @@ class Login
 		if (!self::isAdmin()) {
 			self::bringToLogin(
 				useCurrentPageAsRedirectTarget: true,
-				message: "Du musst ein Administrator sein, um diese Aktion durchzuführen."
+				message: "You must be an Administrator to perform this action."
 			);
 		}
 	}

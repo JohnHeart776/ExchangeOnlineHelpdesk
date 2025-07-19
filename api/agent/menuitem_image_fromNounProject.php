@@ -10,7 +10,7 @@ if (!isset($_POST["guid"])) {
 
 $menuItem = new MenuItem($_POST["guid"]);
 if (!$menuItem->isValid())
-	die(jsonStatus(false, "Menüelement nicht gefunden."));
+	die(jsonStatus(false, "Menüelement not found."));
 
 $client = new NounProjectClient(
 	Config::getConfigValueFor("noun.api.key"),

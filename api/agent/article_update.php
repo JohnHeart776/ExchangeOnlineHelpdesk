@@ -6,7 +6,7 @@ Login::requireIsAgent();
 
 $article = new Article($_POST["pk"]);
 if (!$article->isValid())
-	die(jsonStatus(false, "Artikel nicht gefunden."));
+	die(jsonStatus(false, "Artikel not found."));
 
 $name = $_POST["name"];
 $value = $_POST["value"];

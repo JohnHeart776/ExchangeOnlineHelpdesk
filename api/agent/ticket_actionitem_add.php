@@ -5,13 +5,13 @@ require_once __DIR__ . '/../../src/bootstrap.php';
 Login::requireIsAgent();
 
 if (!isset($_POST["ticket"]))
-	die(jsonStatus(false, "Ticket nicht gefunden."));
+	die(jsonStatus(false, "Ticket not found."));
 
 if (!isset($_POST["title"]))
-	die(jsonStatus(false, "Title nicht gefunden."));
+	die(jsonStatus(false, "Title not found."));
 
 if (!isset($_POST["description"]))
-	die(jsonStatus(false, "Description nicht gefunden."));
+	die(jsonStatus(false, "Description not found."));
 
 $ticket = new Ticket($_POST["ticket"]);
 $title = $_POST["title"];

@@ -8,22 +8,22 @@ use mysqli;
 use PDOException;
 use PDOStatement;
 
-// Basis-Exception für alle Datenbank-bezogenen Fehler
+// Base exception for all database-related errors
 class DatabaseException extends Exception
 {
 }
 
-// Exception für Verbindungsfehler (sowohl MySQLi als auch PDO)
+// Exception for connection errors (both MySQLi and PDO)
 class DatabaseConnectException extends DatabaseException
 {
 }
 
-// Exception für Fehler beim Setzen des Zeichensatzes
+// Exception for errors when setting the character set
 class DatabaseCharsetException extends DatabaseException
 {
 }
 
-// Exception für Fehler bei Query-Ausführungen
+// Exception for query execution errors
 class DatabaseQueryException extends DatabaseException
 {
 	protected string $query;
@@ -84,7 +84,7 @@ class Database
 			throw new DatabaseConnectException("Missing required database environment variables (DBHOST, DBUSER, DBNAME)");
 		}
 
-		// MySQLi-Verbindung herstellen
+		// Establish MySQLi connection
 		$this->link = new mysqli($this->dbConfig['host'], $this->dbConfig['user'], $this->dbConfig['password'], $this->dbConfig['name']);
 		if ($this->link->connect_errno) {
 			throw new DatabaseConnectException("MySQLi connection error: " . $this->link->connect_error);
@@ -99,7 +99,7 @@ class Database
 	}
 
 	/**
-	 * Gibt die MySQLi-Verbindung zurück.
+	 * Returns the MySQLi connection.
 	 *
 	 * @return mysqli|null
 	 */
@@ -109,7 +109,7 @@ class Database
 	}
 
 	/**
-	 * Erstellt die PDO-Verbindung bei Bedarf (lazy loading).
+	 * Creates the PDO connection when needed (lazy loading).
 	 *
 	 * @return void
 	 * @throws DatabaseConnectException
@@ -135,7 +135,7 @@ class Database
 	}
 
 	/**
-	 * Gibt die PDO-Verbindung zurück (erstellt sie bei Bedarf).
+	 * Returns the PDO connection (creates it if needed).
 	 *
 	 * @return PDO|null
 	 */
@@ -146,7 +146,7 @@ class Database
 	}
 
 	/**
-	 * Schließt die MySQLi-Verbindung.
+	 * Closes the MySQLi connection.
 	 */
 	public function close(): void
 	{
@@ -156,7 +156,7 @@ class Database
 	}
 
 	/**
-	 * Schließt die PDO-Verbindung, indem der interne PDO-Handler auf null gesetzt wird.
+	 * Closes the PDO connection by setting the internal PDO handler to null.
 	 */
 	public function closePDO(): void
 	{
@@ -164,7 +164,7 @@ class Database
 	}
 
 	/**
-	 * Führt einen Query über MySQLi aus.
+	 * Executes a query via MySQLi.
 	 *
 	 * @param string $_q
 	 * @return mixed
@@ -211,7 +211,7 @@ class Database
 	}
 
 	/**
-	 * Führt einen Query über PDO aus.
+	 * Executes a query via PDO.
 	 *
 	 * @param string $_q
 	 * @return PDOStatement
@@ -223,7 +223,7 @@ class Database
 	}
 
 	/**
-	 * Führt eine SELECT-Abfrage über MySQLi aus und gibt das Ergebnis als assoziatives Array zurück.
+	 * Executes a SELECT query via MySQLi and returns the result as an associative array.
 	 *
 	 * @param string $_q
 	 * @param bool   $single
@@ -252,12 +252,12 @@ class Database
 	}
 
 	/**
-	 * Führt eine SELECT-Abfrage über PDO aus und gibt das Ergebnis als assoziatives Array zurück.
-	 * Unterstützt Prepared Statements, wenn ein Parameter-Array übergeben wird.
+	 * Executes a SELECT query via PDO and returns the result as an associative array.
+	 * Supports prepared statements when a parameter array is provided.
 	 *
-	 * @param string $_q     Die SQL-Abfrage.
-	 * @param array  $params Optional: Parameter für das Prepared Statement.
-	 * @param bool   $single Gibt an, ob nur ein einzelner Datensatz zurückgegeben werden soll.
+	 * @param string $_q     The SQL query.
+	 * @param array  $params Optional: Parameters for the prepared statement.
+	 * @param bool   $single Indicates whether only a single record should be returned.
 	 * @return mixed
 	 * @throws DatabaseQueryException
 	 */
@@ -278,7 +278,7 @@ class Database
 	}
 
 	/**
-	 * Escaped einen String für MySQLi.
+	 * Escapes a string for MySQLi.
 	 *
 	 * @param string $_string
 	 * @return string
@@ -289,10 +289,10 @@ class Database
 	}
 
 	/**
-	 * Escaped einen String für PDO.
+	 * Escapes a string for PDO.
 	 *
-	 * Hinweis: PDO::quote gibt den String mit umschließenden Anführungszeichen zurück,
-	 * diese werden hier entfernt.
+	 * Note: PDO::quote returns the string with surrounding quotes,
+	 * these are removed here.
 	 *
 	 * @param string $_string
 	 * @return string
@@ -305,7 +305,7 @@ class Database
 	}
 
 	/**
-	 * Gibt die Anzahl der Datensätze einer MySQLi-Query zurück.
+	 * Returns the number of records from a MySQLi query.
 	 *
 	 * @param string $_query
 	 * @return int
@@ -323,7 +323,7 @@ class Database
 	}
 
 	/**
-	 * Gibt die Anzahl der Datensätze einer PDO-Query zurück.
+	 * Returns the number of records from a PDO query.
 	 *
 	 * @param string $_query
 	 * @return int
@@ -357,8 +357,8 @@ class Database
 	}
 
 	/**
-	 * Gibt die ID des zuletzt eingefügten Datensatzes zurück.
-	 * @return string|int|null Die ID des zuletzt eingefügten Datensatzes oder null, falls keine Verbindung besteht.
+	 * Returns the ID of the last inserted record.
+	 * @return string|int|null The ID of the last inserted record or null if no connection exists.
 	 */
 	public function lastInsertIdFromMysqli(): string|int|null
 	{
@@ -369,8 +369,8 @@ class Database
 	}
 
 	/**
-	 * Gibt die ID des zuletzt eingefügten Datensatzes zurück.
-	 * @return string|int|null Die ID des zuletzt eingefügten Datensatzes oder null, falls keine Verbindung besteht.
+	 * Returns the ID of the last inserted record.
+	 * @return string|int|null The ID of the last inserted record or null if no connection exists.
 	 */
 	public function lastInsertIdFromPdo(): string|int|null
 	{

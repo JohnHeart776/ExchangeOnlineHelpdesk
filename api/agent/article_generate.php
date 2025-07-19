@@ -5,11 +5,11 @@ require_once __DIR__ . '/../../src/bootstrap.php';
 Login::requireIsAgent();
 
 if (!isset($_POST["topic"]))
-	die(jsonStatus(false, "Topic nicht angegeben."));
+	die(jsonStatus(false, "Topic not found."));
 
 $topic = $_POST["topic"];
 if (strlen($topic) < 25)
-	die(jsonStatus(false, "Topic zu kurz."));
+	die(jsonStatus(false, "Topic too short."));
 
 $prompt = PromptHelper::generatePropmptForArticleGeneration($topic);
 $content = AiService::getRepsonse($prompt);

@@ -1,5 +1,5 @@
 <a href="/admin/notificationtemplates/" class="btn btn-sm btn-light-info mb-5">
-	<i class="fas fa-arrow-left"></i> Zurück
+	<i class="fas fa-arrow-left"></i> Back
 </a>
 
 <!--begin::Properties Widget-->
@@ -8,14 +8,14 @@
 	<div class="card-header border-0 pt-5">
 
 		<h3 class="card-title align-items-start flex-column">
-			<span class="card-label fw-bold fs-3 mb-1">Benachrichtigungsvorlage
+			<span class="card-label fw-bold fs-3 mb-1">Notification template
 				<a href="#" class="editable text-hover-primary text-gray-800 text-decoration-none"
 				   data-type="text"
 				   data-pk="{$template->getGuid()}"
 				   data-name="Name"
 				   data-url="/api/admin/notificationtemplate/update.json">{$template->getName()}</a>
 			</span>
-			<span class="text-muted mt-1 fw-semibold fs-7">Details der Benachrichtigungsvorlage</span>
+			<span class="text-muted mt-1 fw-semibold fs-7">Details of the notification template</span>
 		</h3>
 	</div>
 	<!--end::Header-->

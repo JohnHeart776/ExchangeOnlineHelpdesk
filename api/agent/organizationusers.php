@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../../src/bootstrap.php';
 
- und Organisation User anzeigen darf
 Login::requireIsAgent();
 
 header('Content-Type: application/json');

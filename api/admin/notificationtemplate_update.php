@@ -6,7 +6,7 @@ Login::requireIsAdmin();
 
 $template = new NotificationTemplate($_POST["pk"]);
 if (!$template->isValid())
-	die(jsonStatus(false, "Benachrichtigungsvorlage nicht gefunden."));
+	die(jsonStatus(false, "Notification template not found."));
 
 $name = $_POST["name"];
 $value = $_POST["value"];
@@ -19,7 +19,7 @@ try {
 	}
 
 	if (!$updateResult) {
-		die(jsonStatus(false, "Benachrichtigungsvorlage konnte nicht aktualisiert werden."));
+		die(jsonStatus(false, "Failed to update notification template."));
 	}
 
 	echo jsonStatus(true, "", $template->toJsonObject());

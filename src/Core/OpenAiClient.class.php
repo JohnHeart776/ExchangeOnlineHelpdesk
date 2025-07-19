@@ -12,7 +12,7 @@ class OpenAiClient implements AiClientInterface
 
 	/**
 	 * @param OpenAiApiAuthenticator $authenticator
-	 * @param bool|null              $useLocalAiCache (lokaler AI-Cache)
+	 * @param bool|null $useLocalAiCache (local AI cache)
 	 * @param bool|null              $appendBaselinePromptToPrompt
 	 * @throws \Database\DatabaseQueryException
 	 */
@@ -33,11 +33,11 @@ class OpenAiClient implements AiClientInterface
 	}
 
 	/**
-	 * Sendet den userPrompt (plus optionalem Baseline-Prompt) und Optionen
-	 * an die OpenAI-API oder an das optionale Proxy-Skript.
+	 * Sends the userPrompt (plus optional baseline prompt) and options
+	 * to the OpenAI API or to the optional proxy script.
 	 *
 	 * @param string $userPrompt
-	 * @param array  $options Zusätzliche Parameter (z.B. temperature, max_tokens)
+	 * @param array  $options Additional parameters (e.g. temperature, max_tokens)
 	 * @return \Struct\OpenAiReponse|null
 	 * @throws Exception
 	 */
@@ -47,13 +47,13 @@ class OpenAiClient implements AiClientInterface
 			return null;
 		}
 
-		// Relativer Endpoint
+		// Relative endpoint
 		$relativeEndpoint = '/v1/chat/completions';
 
-		// URL wählen: externes Cache/Proxy oder direkter API-Aufruf
+		// Choose URL: external cache/proxy or direct API call
 		if ($this->useProxy) {
 			if (!$this->proxyUrl) {
-				throw new \RuntimeException('Proxy aktiviert, aber openai.cache.url nicht gesetzt.');
+				throw new \RuntimeException('Proxy enabled but openai.cache.url not set.');
 			}
 			$apiUrl = $this->proxyUrl . '?endpoint=' . $relativeEndpoint;
 		} else {
@@ -82,7 +82,7 @@ class OpenAiClient implements AiClientInterface
 			'content' => $prompt,
 		];
 
-		// JSON und Hash für lokalen Cache
+		// JSON and hash for local cache
 		$payloadJson = json_encode($payload);
 		$payloadHash = hash('sha256', __CLASS__ . '--' . $payloadJson);
 
@@ -91,7 +91,7 @@ class OpenAiClient implements AiClientInterface
 			$aiCache = AiCacheController::searchOneBy('PayloadHash', $payloadHash);
 		}
 
-		// Anfrage nur wenn nicht im lokalen Cache
+		// Request only if not in local cache
 		if (!$aiCache) {
 			$headers = $this->authenticator->getAuthenticationHeaders();
 			$ch = curl_init($apiUrl);
@@ -128,7 +128,7 @@ class OpenAiClient implements AiClientInterface
 	}
 
 	/**
-	 * Gibt das aktuell verwendete Modell zurück.
+	 * Returns the currently used model.
 	 *
 	 * @return string
 	 */
@@ -138,7 +138,7 @@ class OpenAiClient implements AiClientInterface
 	}
 
 	/**
-	 * Gibt den Baseline-Prompt zurück (falls gesetzt).
+	 * Returns the baseline prompt (if set).
 	 *
 	 * @return string|null
 	 */
@@ -175,12 +175,12 @@ class OpenAiClient implements AiClientInterface
 			return null;
 		}
 
-		// Relativer Endpoint
+		// Relative endpoint
 		$relativeEndpoint = '/v1/chat/completions';
 
 		if ($this->useProxy) {
 			if (!$this->proxyUrl) {
-				throw new \RuntimeException('Proxy aktiviert, aber openai.cache.url nicht gesetzt.');
+				throw new \RuntimeException('AI Proxy enabled but no openai.cache.url set.');
 			}
 			$apiUrl = $this->proxyUrl . '?endpoint=' . $relativeEndpoint;
 		} else {
@@ -191,7 +191,7 @@ class OpenAiClient implements AiClientInterface
 			'model' => $this->model,
 			'messages' => $messages,
 		];
-		// JSON und Hash für lokalen Cache
+		// JSON and hash for local cache
 		$payloadJson = json_encode($payload);
 		$payloadHash = hash('sha256', __CLASS__ . '--' . $payloadJson);
 
@@ -200,7 +200,7 @@ class OpenAiClient implements AiClientInterface
 			$aiCache = AiCacheController::searchOneBy('PayloadHash', $payloadHash);
 		}
 
-		// Anfrage nur wenn nicht im lokalen Cache
+		// Request only if not in local cache
 		if (!$aiCache) {
 			$headers = $this->authenticator->getAuthenticationHeaders();
 			$ch = curl_init($apiUrl);

@@ -6,7 +6,7 @@ Login::requireIsAgent();
 
 $actionGroup = new ActionGroup($_POST["pk"]);
 if (!$actionGroup->isValid())
-	die(jsonStatus(false, "Aktionsgruppe nicht gefunden."));
+	die(jsonStatus(false, "Aktionsgruppe not found."));
 
 $name = $_POST["name"];
 $value = $_POST["value"];

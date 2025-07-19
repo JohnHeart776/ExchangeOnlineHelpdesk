@@ -6,7 +6,7 @@ Login::requireIsAdmin();
 
 $user = new User($_POST["pk"]);
 if (!$user->isValid())
-	die(jsonStatus(false, "Benutzer nicht gefunden."));
+	die(jsonStatus(false, "Benutzer not found."));
 
 $name = $_POST["name"];
 $value = $_POST["value"];

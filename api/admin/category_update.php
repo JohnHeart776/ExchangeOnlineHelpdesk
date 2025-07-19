@@ -6,7 +6,7 @@ Login::requireIsAdmin();
 
 $category = new Category($_POST["pk"]);
 if (!$category->isValid())
-	die(jsonStatus(false, "Kategorie nicht gefunden."));
+	die(jsonStatus(false, "Kategorie not found."));
 
 $name = $_POST["name"];
 $value = $_POST["value"];

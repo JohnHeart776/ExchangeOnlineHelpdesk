@@ -163,7 +163,7 @@
 
 							if (response.status) {
 								Swal.fire({
-									text: 'Aktionselement erfolgreich hinzugefügt',
+									text: 'Action item successfully added',
 									icon: 'success',
 									confirmButtonText: 'OK'
 								}).then(() => {
@@ -172,7 +172,7 @@
 								});
 							} else {
 								Swal.fire({
-									text: 'Fehler beim Hinzufügen des Aktionselements',
+									text: 'Error adding action item',
 									icon: 'error',
 									confirmButtonText: 'OK'
 								});
@@ -180,7 +180,7 @@
 						})
 						.fail(function () {
 							Swal.fire({
-								text: 'Fehler beim Hinzufügen des Aktionselements aufgetreten',
+								text: 'Error occurred while adding action item',
 								icon: 'error',
 								confirmButtonText: 'OK'
 							});

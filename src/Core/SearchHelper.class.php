@@ -3,7 +3,7 @@
 class SearchHelper
 {
 	/**
-	 * Führt eine Mehrwortsuche für Organisation-Users aus.
+	 * Performs a multi-word search for organization users.
 	 *
 	 * @param mixed $query
 	 *
@@ -13,18 +13,18 @@ class SearchHelper
 	{
 		global $d;
 
-		// Beispiel: "John Doe Manager"
-		// => suchet alle Datensätze, in denen 'DisplayName' "John" UND "Doe" UND "Manager" enthält.
+		// Example: "John Doe Manager"
+		// => searches all records where 'DisplayName' contains "John" AND "Doe" AND "Manager".
 
-		// In Einzelwörter zerteilen
+		// Split into individual words
 		$words = array_filter(explode(' ', (string)$query));
 
-		// Falls keine Wörter vorhanden sind, leere Liste zurückgeben (oder anders handeln)
+		// If no words are present, return empty list (or handle differently)
 		if (empty($words)) {
 			return [];
 		}
 
-		// Bedingungen dynamisch aufbauen
+		// Build conditions dynamically
 		$conditions = [];
 		$params = [];
 		foreach ($words as $index => $word) {
@@ -32,11 +32,11 @@ class SearchHelper
 			$params[":word{$index}"] = '%' . $word . '%';
 		}
 
-		// WHERE-Bedingungen zusammenführen
-		// Hier "AND", damit alle Suchworte gefunden werden müssen
+		// Merge WHERE conditions
+		// Here "AND" so that all search words must be found
 		$whereClause = implode(' AND ', $conditions);
 
-		// Komplette Query
+		// Complete query
 		$_q = "SELECT OrganizationUserId
                 FROM OrganizationUser
                 WHERE $whereClause";

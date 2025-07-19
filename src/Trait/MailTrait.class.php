@@ -28,7 +28,7 @@ trait MailTrait
 
 	public function getHeadersAsArray(): array
 	{
-		// Falls HeadersJson leer ist, ein leeres Array zurückgeben.
+		// If HeadersJson is empty, return an empty array.
 		if (empty($this->HeadersJson)) {
 			return [];
 		}

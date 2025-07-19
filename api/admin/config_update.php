@@ -6,7 +6,7 @@ Login::requireIsAdmin();
 
 $config = new Config($_POST["pk"]);
 if (!$config->isValid())
-	die(jsonStatus(false, "Config nicht gefunden."));
+	die(jsonStatus(false, "Config not found."));
 
 $name = $_POST["name"];
 $value = $_POST["value"];

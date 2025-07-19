@@ -3,7 +3,7 @@
 	<!--begin::Left-->
 	<div class="d-flex flex-wrap align-items-center my-1">
 		<a href="/agent/menus" class="btn btn-sm btn-primary me-2">
-			<i class="fas fa-chevron-circle-left"></i> Zurück zur Übersicht
+			<i class="fas fa-chevron-circle-left"></i> Back to overview
 		</a>
 
 
@@ -18,7 +18,7 @@
 		<div class="d-flex flex-wrap align-items-center my-1">
 
 			<a href="/agent/menuitem/{$menuItem->getParent()->getGuid()}" class="btn btn-sm btn-secondard me-2">
-				<i class="fas fa-arrow-left"></i> Zurück zum übergeordneten Menü: {$menuItem->getParent()->getTitle()}
+				<i class="fas fa-arrow-left"></i> Back to parent menu: {$menuItem->getParent()->getTitle()}
 			</a>
 		</div>
 		<!--end::Left-->
@@ -30,9 +30,9 @@
 	<!--begin::Header-->
 	<div class="card-header border-0 pt-5">
 		<h3 class="card-title align-items-start flex-column">
-			<span class="card-label fw-bold fs-3 mb-1">Menüeintrag <a href="#" class="editable text-hover-primary text-gray-800 text-decoration-none" data-type="text" data-pk="{$menuItem->getGuid()}" data-name="Title"
+			<span class="card-label fw-bold fs-3 mb-1">Menu item <a href="#" class="editable text-hover-primary text-gray-800 text-decoration-none" data-type="text" data-pk="{$menuItem->getGuid()}" data-name="Title"
 																	  data-url="/api/agent/menuitem/update.json">{$menuItem->getTitle()}</a></span>
-			<span class="text-muted mt-1 fw-semibold fs-7">Details des ausgewählten Menüeintrags</span>
+			<span class="text-muted mt-1 fw-semibold fs-7">Details of the selected menu item</span>
 		</h3>
 	</div>
 	<!--end::Header-->

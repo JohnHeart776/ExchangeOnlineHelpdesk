@@ -10,7 +10,7 @@ if (isset($_GET["solve"]) && $_GET["solve"] == "1")
 
 $ticket = new Ticket($_POST["ticket"]);
 if (!$ticket->isValid())
-	die(jsonStatus(false, "Ticket nicht gefunden."));
+	die(jsonStatus(false, "Ticket not found."));
 
 if (isset($_POST["assignme"]) && !empty($_POST["assignme"])) {
 	$ticket = $ticket->assignUser(Login::getUser());

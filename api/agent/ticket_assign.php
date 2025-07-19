@@ -19,7 +19,7 @@ if (!$agent->isValid()) {
 
 $ticket = new Ticket($_POST["ticket"]);
 if (!$ticket->isValid())
-	die(jsonStatus(false, "Ticket nicht gefunden."));
+	die(jsonStatus(false, "Ticket not found."));
 
 $ticket = $ticket->assignUser($agent);
 

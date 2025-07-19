@@ -3,6 +3,7 @@ require_once __DIR__ . '/src/bootstrap.php';
 login::requireIsUser();
 
 $menu = MenuController::searchOneBy("Name", "ApplicationMenu");
+global $s;
 $s->assign("menu", $menu);
 
 $articles = ArticleController::getAll(sortBy: "Title");

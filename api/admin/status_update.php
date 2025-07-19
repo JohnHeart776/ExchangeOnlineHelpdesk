@@ -6,7 +6,7 @@ Login::requireIsAdmin();
 
 $status = new Status($_POST["pk"]);
 if (!$status->isValid())
-	die(jsonStatus(false, "Status nicht gefunden."));
+	die(jsonStatus(false, "Status not found."));
 
 $name = $_POST["name"];
 $value = $_POST["value"];
@@ -19,7 +19,7 @@ try {
 	}
 
 	if (!$updateResult) {
-		die(jsonStatus(false, "Status konnte nicht aktualisiert werden."));
+		die(jsonStatus(false, "Status could not be updated."));
 	}
 
 	echo jsonStatus(true, "", $status->toJsonObject());

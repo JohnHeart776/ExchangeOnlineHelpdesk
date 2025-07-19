@@ -13,7 +13,7 @@ class OpenAiApiAuthenticator
 	}
 
 	/**
-	 * Liefert einen Standard-Instanz mit dem API-Key aus der Konfiguration.
+	 * Returns a default instance with the API key from the configuration.
 	 */
 	public static function getDefault(): OpenAiApiAuthenticator
 	{
@@ -21,7 +21,7 @@ class OpenAiApiAuthenticator
 	}
 
 	/**
-	 * Gibt die HTTP-Header für die API-Anfrage zurück.
+	 * Returns the HTTP headers for the API request.
 	 *
 	 * @return array
 	 */
@@ -34,7 +34,7 @@ class OpenAiApiAuthenticator
 	}
 
 	/**
-	 * Gibt den rohen API-Key zurück.
+	 * Returns the raw API key.
 	 */
 	public function getApiKey(): string
 	{
@@ -42,7 +42,7 @@ class OpenAiApiAuthenticator
 	}
 
 	/**
-	 * Basis-URL der OpenAI API, inkl. Version.
+	 * Base URL of the OpenAI API, including version.
 	 *
 	 * @return string
 	 */

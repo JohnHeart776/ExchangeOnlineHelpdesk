@@ -6,7 +6,7 @@ Login::requireLogin();
 $user = Login::getUser();
 if (!$user) {
 	http_response_code(403);
-	exit('Kein Benutzerbild verfügbar.');
+	exit('No user image available.');
 }
 
 $userImage = $user->getUserImage();

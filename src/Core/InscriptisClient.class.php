@@ -36,7 +36,7 @@ class InscriptisClient
 			throw new Exception('cURL could not be initialized.');
 		}
 
-		// cURL-Optionen setzen
+		// Set cURL options
 		curl_setopt($ch, CURLOPT_URL, $this->serviceUrl);
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -44,16 +44,16 @@ class InscriptisClient
 		]);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $html);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Timeout in Sekunden
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Timeout in seconds
 
-		// Anfrage ausführen
+		// Execute request
 		$response = curl_exec($ch);
 
-		// Fehlerüberprüfung
+		// Error checking
 		if ($response === false) {
 			$errorMsg = curl_error($ch);
 			curl_close($ch);
-			throw new Exception("cURL-Fehler: " . $errorMsg);
+			throw new Exception("cURL error: " . $errorMsg);
 		}
 
 		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
