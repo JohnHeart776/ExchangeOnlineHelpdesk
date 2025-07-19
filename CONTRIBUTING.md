@@ -20,7 +20,7 @@ Welcome to the Exchange Online Helpdesk project! We're excited that you're inter
 EOTS is an enterprise-grade ticket management system that integrates with Microsoft 365 environments. It automatically processes emails into tickets, provides role-based access control, and includes AI-powered features for automated responses and categorization.
 
 ### Key Technologies
-- **Backend**: PHP 7.4+ with custom framework (no Composer)
+- **Backend**: PHP 8.4+ with custom framework (no Composer)
 - **Database**: MySQL/MariaDB with utf8mb4 charset
 - **Templating**: Smarty 4.3.0
 - **Testing**: PHPUnit 9.5
@@ -38,7 +38,7 @@ The project follows a custom MVC-like architecture with:
 ## Development Environment Setup
 
 ### Prerequisites
-- **PHP 7.4+** with extensions: mysqli, pdo, curl, json, mbstring
+- **PHP 8.4+** with extensions: mysqli, pdo, curl, json, mbstring
 - **MySQL/MariaDB** with utf8mb4 charset support
 - **Web server** (Apache/Nginx) with PHP support
 - **PHPUnit 9.5** (install separately - project doesn't use Composer)
@@ -318,7 +318,7 @@ Brief description of changes made
 - **Imports**: `_import.php` (for directory-level includes)
 
 ### Coding Standards
-- **PHP Version**: Target PHP 7.4+ features
+- **PHP Version**: Target PHP 8.4+ features
 - **Naming**: Use camelCase for methods and variables
 - **Classes**: Use PascalCase for class names
 - **Constants**: Use UPPER_SNAKE_CASE

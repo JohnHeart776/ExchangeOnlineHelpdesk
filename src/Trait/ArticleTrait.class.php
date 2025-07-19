@@ -2,6 +2,8 @@
 
 trait ArticleTrait
 {
+	use JsonSerializableTrait;
+	use BooleanCheckTrait;
 
 	public function getLink()
 	{
@@ -20,22 +22,21 @@ trait ArticleTrait
 
 	public function toJsonObject(): array
 	{
-		return [
-			"guid" => $this->getGuid(),
+		return array_merge($this->getBaseJsonFields(), [
 			"title" => $this->getTitle(),
 			"slug" => $this->getSlug(),
 			"link" => $this->getLink(),
-		];
+		]);
 	}
 
 	public function getAccessLevelIsPublic(): bool
 	{
-		return $this->getAccessLevel() == "Public";
+		return $this->isFieldEqualTo('getAccessLevel', 'Public');
 	}
 
 	public function getAccessLevelIsAgent(): bool
 	{
-		return $this->getAccessLevel() == "Agent";
+		return $this->isFieldEqualTo('getAccessLevel', 'Agent');
 	}
 
 	public function getContentForTinyMce(): string

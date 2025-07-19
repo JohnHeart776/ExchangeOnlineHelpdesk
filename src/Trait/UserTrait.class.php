@@ -2,6 +2,9 @@
 
 trait UserTrait
 {
+	use JsonSerializableTrait;
+	use BooleanCheckTrait;
+	use EntityRelationshipTrait;
 
 	public function fromGraphLoginResponseData(array $orgInfo, array $graphData): self
 	{
@@ -57,12 +60,12 @@ trait UserTrait
 		if ($this->isAdmin())
 			return true;
 
-		return $this->GetUserRole() == "agent";
+		return $this->isFieldEqualTo('getUserRole', 'agent');
 	}
 
 	public function isAdmin()
 	{
-		return $this->GetUserRole() == "admin";
+		return $this->isFieldEqualTo('getUserRole', 'admin');
 	}
 
 	/**
@@ -83,18 +86,17 @@ trait UserTrait
 	 */
 	public function toJsonObject(): array
 	{
-		return [
-			"guid" => $this->getGuid(),
+		return array_merge($this->getBaseJsonFields(), [
 			"name" => $this->getDisplayName(),
 			"email" => $this->getMail(),
 			"role" => $this->getUserRole(),
 			"image" => $this->getUserImageLink(),
-		];
+		]);
 	}
 
 	public function isEnabled(): bool
 	{
-		return $this->getEnabledAsInt() > 0;
+		return $this->isBooleanFieldTrue('getEnabledAsInt');
 	}
 
 	/**
